@@ -1,0 +1,59 @@
+# Orbital Holdfast — build, sign and upload to App Store Connect from GitHub Actions (macOS runner).
+# Needs three repository secrets: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (contents of the .p8 file).
+default_platform(:ios)
+
+APP_ID   = "com.cubiccm.holdfast"
+XCPROJ   = "ios/App/App.xcodeproj"
+XCWS     = "ios/App/App.xcworkspace"
+
+platform :ios do
+  desc "Archive and upload to TestFlight / App Store Connect"
+  lane :release do
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_content: ENV.fetch("ASC_KEY_P8"),
+      in_house: false
+    )
+
+    setup_ci # temporary keychain on the runner
+
+    # Distribution certificate (downloads an existing one whose key we hold, else creates one)
+    get_certificates(api_key: api_key, development: false, generate_apple_certs: true)
+
+    # App Store provisioning profile for the bundle id
+    get_provisioning_profile(api_key: api_key, app_identifier: APP_ID, force: true)
+    profile_name = lane_context[SharedValues::SIGH_NAME]
+    profile_path = lane_context[SharedValues::SIGH_PROFILE_PATH]
+    team_id = sh("security cms -D -i '#{profile_path}' | plutil -extract TeamIdentifier.0 raw -").strip
+    UI.message("Team: #{team_id}  Profile: #{profile_name}")
+
+    update_code_signing_settings(
+      path: XCPROJ,
+      use_automatic_signing: false,
+      team_id: team_id,
+      code_sign_identity: "Apple Distribution",
+      profile_name: profile_name,
+      bundle_identifier: APP_ID,
+      targets: ["App"]
+    )
+
+    # Next build number = highest on App Store Connect + 1
+    latest = latest_testflight_build_number(api_key: api_key, app_identifier: APP_ID, initial_build_number: 0) rescue 0
+    build_no = (latest.to_i + 1).to_s
+    UI.message("Build number: #{build_no}")
+
+    build_app(
+      workspace: XCWS,
+      scheme: "App",
+      configuration: "Release",
+      export_method: "app-store",
+      xcargs: "CURRENT_PROJECT_VERSION=#{build_no} DEVELOPMENT_TEAM=#{team_id}",
+      export_options: { provisioningProfiles: { APP_ID => profile_name }, signingStyle: "manual", teamID: team_id },
+      output_directory: "build",
+      output_name: "OrbitalHoldfast.ipa"
+    )
+
+    upload_to_testflight(api_key: api_key, skip_waiting_for_build_processing: true, ipa: "build/OrbitalHoldfast.ipa")
+  end
+end
