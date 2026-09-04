@@ -20,10 +20,15 @@ env:
 jobs:
   build:
     if: ${{ !inputs.submit }}
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 26 (App Store requires the iOS 26 SDK)
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$XC" ]; then echo "::error::No Xcode 26 on this runner image"; ls /Applications | grep Xcode; exit 1; fi
+          sudo xcode-select -s "$XC"; xcodebuild -version
       - name: Check secrets
         run: |
           if [ -z "$ASC_KEY_ID" ] || [ -z "$ASC_ISSUER_ID" ] || [ -z "$ASC_KEY_P8" ]; then
