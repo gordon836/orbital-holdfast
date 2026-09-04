@@ -1,0 +1,37 @@
+name: iOS — build & upload to App Store Connect
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore: [".github/workflows/fix-permissions.yml", "README.md", "STORE_LISTING.md"]
+concurrency: ios-release
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci --no-audit --no-fund
+      - run: npx cap sync ios
+      - name: CocoaPods
+        working-directory: ios/App
+        run: pod install --repo-update
+      - name: Build, sign & upload
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          FASTLANE_SKIP_UPDATE_CHECK: "1"
+        run: |
+          if [ -z "$ASC_KEY_ID" ]; then echo "::error::Add repository secrets ASC_KEY_ID, ASC_ISSUER_ID and ASC_KEY_P8 first (Settings → Secrets and variables → Actions)."; exit 1; fi
+          fastlane ios release
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ipa-and-logs
+          path: |
+            build/*.ipa
+            ~/Library/Logs/gym/*.log
+          if-no-files-found: ignore
