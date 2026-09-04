@@ -1,10 +1,19 @@
 # Orbital Holdfast — build, sign, upload and publish the App Store listing from GitHub Actions.
 # Repository secrets: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (contents of the .p8 file).
+#
+# Signing: the first run creates an Apple Distribution certificate and saves its private key
+# (encrypted with a key derived from ASC_KEY_P8) under signing/ so the workflow can cache it.
+# Later runs restore that file, so no new certificates are created (Apple allows only three).
 default_platform(:ios)
+
+require "digest"
 
 APP_ID = "com.cubiccm.holdfast"
 XCPROJ = "ios/App/App.xcodeproj"
 XCWS   = "ios/App/App.xcworkspace"
+SIGN_DIR = File.expand_path("../signing", __dir__)
+ENC_FILE = File.join(SIGN_DIR, "dist.p12.enc")
+ID_FILE  = File.join(SIGN_DIR, "cert_id.txt")
 
 def asc_key
   app_store_connect_api_key(
@@ -15,17 +24,42 @@ def asc_key
   )
 end
 
+def enc_pass
+  Digest::SHA256.hexdigest("holdfast-signing:" + ENV.fetch("ASC_KEY_P8"))
+end
+
 platform :ios do
   desc "Archive and upload the app to App Store Connect / TestFlight"
   lane :release do
     api_key = asc_key
     setup_ci
-    get_certificates(api_key: api_key, development: false, generate_apple_certs: true)
-    get_provisioning_profile(api_key: api_key, app_identifier: APP_ID, force: true)
+    keychain = File.expand_path("~/Library/Keychains/fastlane_tmp_keychain-db")
+    FileUtils.mkdir_p(SIGN_DIR)
+
+    cert_id = nil
+    if File.exist?(ENC_FILE) && File.exist?(ID_FILE)
+      UI.message("Restoring cached distribution certificate")
+      p12 = File.join(SIGN_DIR, "dist.p12")
+      sh("openssl enc -d -aes-256-cbc -pbkdf2 -in '#{ENC_FILE}' -out '#{p12}' -pass pass:#{enc_pass}")
+      import_certificate(certificate_path: p12, certificate_password: "", keychain_path: keychain, keychain_password: "")
+      cert_id = File.read(ID_FILE).strip
+      File.delete(p12)
+    else
+      UI.message("No cached certificate — creating one")
+      get_certificates(api_key: api_key, development: false, generate_apple_certs: true, output_path: SIGN_DIR, keychain_path: keychain, keychain_password: "")
+      cert_id = lane_context[SharedValues::CERT_CERTIFICATE_ID]
+      p12 = Dir[File.join(SIGN_DIR, "*.p12")].first
+      UI.user_error!("Certificate private key was not exported") unless p12
+      sh("openssl enc -aes-256-cbc -pbkdf2 -in '#{p12}' -out '#{ENC_FILE}' -pass pass:#{enc_pass}")
+      File.write(ID_FILE, cert_id)
+      Dir[File.join(SIGN_DIR, "*.p12"), File.join(SIGN_DIR, "*.cer")].each { |f| File.delete(f) }
+    end
+
+    get_provisioning_profile(api_key: api_key, app_identifier: APP_ID, cert_id: cert_id, force: true)
     profile_name = lane_context[SharedValues::SIGH_NAME]
     profile_path = lane_context[SharedValues::SIGH_PROFILE_PATH]
     team_id = sh("security cms -D -i '#{profile_path}' | plutil -extract TeamIdentifier.0 raw -").strip
-    UI.message("Team #{team_id} — profile #{profile_name}")
+    UI.message("Team #{team_id} — profile #{profile_name} — cert #{cert_id}")
 
     update_code_signing_settings(
       path: XCPROJ, use_automatic_signing: false, team_id: team_id,
