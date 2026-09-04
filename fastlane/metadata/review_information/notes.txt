@@ -1,0 +1,1 @@
+Single-player offline game. No login, no accounts, no network. Tap START WAVE to begin; a full level takes about 6 minutes. Use the 3x button to speed through waves. Nothing to purchase.
