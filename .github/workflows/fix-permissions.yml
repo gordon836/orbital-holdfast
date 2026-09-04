@@ -1,0 +1,17 @@
+name: Make Xcode Cloud script executable
+on:
+  push:
+    paths: ["ios/App/ci_scripts/**"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  chmod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git update-index --chmod=+x ios/App/ci_scripts/ci_post_clone.sh
+          if git diff --cached --quiet; then echo "already executable"; else git commit -m "chore: mark ci_post_clone.sh executable" && git push; fi
