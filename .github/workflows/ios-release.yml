@@ -28,6 +28,12 @@ jobs:
         run: |
           if [ -z "$ASC_KEY_ID" ] || [ -z "$ASC_ISSUER_ID" ] || [ -z "$ASC_KEY_P8" ]; then
             echo "::error::Add repository secrets ASC_KEY_ID, ASC_ISSUER_ID and ASC_KEY_P8 (Settings → Secrets and variables → Actions)."; exit 1; fi
+      - name: Restore signing certificate (encrypted)
+        id: signing
+        uses: actions/cache/restore@v4
+        with:
+          path: signing
+          key: dist-cert-v1
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: npm }
       - run: npm ci --no-audit --no-fund
@@ -37,6 +43,12 @@ jobs:
         run: pod install --repo-update
       - name: Build, sign & upload
         run: fastlane ios release
+      - name: Save signing certificate (encrypted)
+        if: always() && steps.signing.outputs.cache-hit != 'true' && hashFiles('signing/dist.p12.enc') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: signing
+          key: dist-cert-v1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
