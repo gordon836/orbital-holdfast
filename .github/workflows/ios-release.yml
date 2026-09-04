@@ -6,9 +6,13 @@ on:
         description: "Only submit 1.0 for App Review (needs a processed build)"
         type: boolean
         default: false
+      listing_only:
+        description: "Only publish the store listing (skip the build)"
+        type: boolean
+        default: false
   push:
     branches: [main]
-    paths: ["www/**", "ios/**", "fastlane/**", "package.json", "capacitor.config.json", ".github/workflows/ios-release.yml"]
+    paths: ["www/**", "ios/**", "fastlane/Fastfile", "package.json", "capacitor.config.json", ".github/workflows/ios-release.yml"]
 concurrency: ios-release
 env:
   ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
@@ -19,7 +23,7 @@ env:
   LANG: en_US.UTF-8
 jobs:
   build:
-    if: ${{ !inputs.submit }}
+    if: ${{ !inputs.submit && !inputs.listing_only }}
     runs-on: macos-26
     timeout-minutes: 60
     steps:
@@ -63,7 +67,7 @@ jobs:
             ~/Library/Logs/gym/*.log
           if-no-files-found: ignore
   listing:
-    if: ${{ !inputs.submit }}
+    if: ${{ !cancelled() && !inputs.submit && (inputs.listing_only || needs.build.result == 'success') }}
     needs: build
     runs-on: macos-15
     timeout-minutes: 30
