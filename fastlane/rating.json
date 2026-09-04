@@ -12,8 +12,6 @@
   "violenceRealistic": "NONE",
   "violenceRealisticProlongedGraphicOrSadistic": "NONE",
   "unrestrictedWebAccess": false,
-  "gamblingAndContests": false,
   "gambling": false,
-  "seventeenPlus": false,
-  "kidsAgeBand": null
+  "lootBox": false
 }
