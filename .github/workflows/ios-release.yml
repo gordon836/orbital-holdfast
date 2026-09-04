@@ -1,16 +1,33 @@
-name: iOS — build & upload to App Store Connect
+name: iOS — build, upload & publish listing
 on:
   workflow_dispatch:
+    inputs:
+      submit:
+        description: "Only submit 1.0 for App Review (needs a processed build)"
+        type: boolean
+        default: false
   push:
     branches: [main]
-    paths-ignore: [".github/workflows/fix-permissions.yml", "README.md", "STORE_LISTING.md"]
+    paths: ["www/**", "ios/**", "fastlane/**", "package.json", "capacitor.config.json", ".github/workflows/ios-release.yml"]
 concurrency: ios-release
+env:
+  ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+  ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+  ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+  FASTLANE_SKIP_UPDATE_CHECK: "1"
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
 jobs:
   build:
+    if: ${{ !inputs.submit }}
     runs-on: macos-15
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - name: Check secrets
+        run: |
+          if [ -z "$ASC_KEY_ID" ] || [ -z "$ASC_ISSUER_ID" ] || [ -z "$ASC_KEY_P8" ]; then
+            echo "::error::Add repository secrets ASC_KEY_ID, ASC_ISSUER_ID and ASC_KEY_P8 (Settings → Secrets and variables → Actions)."; exit 1; fi
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: npm }
       - run: npm ci --no-audit --no-fund
@@ -19,14 +36,7 @@ jobs:
         working-directory: ios/App
         run: pod install --repo-update
       - name: Build, sign & upload
-        env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
-          FASTLANE_SKIP_UPDATE_CHECK: "1"
-        run: |
-          if [ -z "$ASC_KEY_ID" ]; then echo "::error::Add repository secrets ASC_KEY_ID, ASC_ISSUER_ID and ASC_KEY_P8 first (Settings → Secrets and variables → Actions)."; exit 1; fi
-          fastlane ios release
+        run: fastlane ios release
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -35,3 +45,20 @@ jobs:
             build/*.ipa
             ~/Library/Logs/gym/*.log
           if-no-files-found: ignore
+  listing:
+    if: ${{ !inputs.submit }}
+    needs: build
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish store listing
+        run: fastlane ios listing
+  submit:
+    if: ${{ inputs.submit }}
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Submit 1.0 for review
+        run: fastlane ios submit
