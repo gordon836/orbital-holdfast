@@ -44,6 +44,12 @@ platform :ios do
       import_certificate(certificate_path: p12, certificate_password: "", keychain_path: keychain, keychain_password: "")
       cert_id = File.read(ID_FILE).strip
       File.delete(p12)
+      # The .p12 holds the private key; fetch the matching public certificate from Apple
+      # (cert matches on the installed key, so it reuses NN47MAV2VQ instead of creating one).
+      get_certificates(api_key: api_key, development: false, generate_apple_certs: true, output_path: SIGN_DIR, keychain_path: keychain, keychain_password: "")
+      found = lane_context[SharedValues::CERT_CERTIFICATE_ID]
+      UI.user_error!("Expected certificate #{cert_id} but fastlane picked #{found}") unless found == cert_id
+      Dir[File.join(SIGN_DIR, "*.p12"), File.join(SIGN_DIR, "*.cer")].each { |f| File.delete(f) }
     else
       UI.message("No cached certificate — creating one")
       get_certificates(api_key: api_key, development: false, generate_apple_certs: true, output_path: SIGN_DIR, keychain_path: keychain, keychain_password: "")
