@@ -1,0 +1,11 @@
+{
+  "appId": "com.cubiccm.holdfast",
+  "appName": "Orbital Holdfast",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#0B1230",
+    "preferredContentMode": "mobile"
+  },
+  "server": { "iosScheme": "capacitor" }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "orbital-holdfast",
+  "version": "0.1.0",
+  "description": "Orbital Holdfast — voxel tower defence prototype (Capacitor iOS shell)",
+  "main": "index.js",
+  "scripts": {
+    "ios:sync": "npx cap sync ios",
+    "ios:open": "npx cap open ios",
+    "assets": "npx @capacitor/assets generate --ios --iconBackgroundColor \"#0B1230\" --splashBackgroundColor \"#0B1230\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/cli": "^6.2.2",
+    "@capacitor/core": "^6.2.2",
+    "@capacitor/ios": "^6.2.2"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5"
+  }
+}
