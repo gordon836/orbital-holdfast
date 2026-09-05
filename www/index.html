@@ -104,6 +104,7 @@
   #btitle .btn.hot{background:var(--gold);color:#1a0d00;border-color:var(--gold);box-shadow:0 3px 0 #9a6a00}
   #bcard .ar .tr{height:6px;background:#0a0f26;border-radius:3px;overflow:hidden;margin:3px 0} #bcard .ar .f{height:100%;background:linear-gradient(90deg,var(--laser),var(--gas))}
   #bBase.hot{box-shadow:0 4px 0 #1f5f8f,0 0 0 3px rgba(255,211,77,.6)}
+  #bacts{display:flex;gap:6px}#bacts .btn{flex:1;padding:7px 6px;font-size:10px;box-shadow:0 3px 0 #0a0f26}#bacts .btn.hot{background:var(--gold);color:#1a0d00;border-color:var(--gold);box-shadow:0 3px 0 #9a6a00}
   #bq{display:flex;flex-direction:column;gap:4px}
   #bq .qr{display:flex;align-items:center;gap:8px;background:rgba(20,28,63,.92);border:2px solid var(--line);border-radius:10px;padding:5px 10px;font-size:12px;font-weight:800;cursor:pointer}
   #bq .qr.idle{color:var(--mute);font-weight:700;cursor:default}
@@ -132,7 +133,7 @@
   #bcard .chip{display:flex;flex-direction:column;align-items:flex-start;gap:1px;background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:6px 9px;color:var(--ink);font-family:var(--body);font-weight:800;font-size:12px;text-align:left;cursor:pointer}
   #bcard .chip small{font-weight:700;color:var(--mute);font-size:10px} #bcard .chip.on{border-color:var(--gas);background:rgba(88,214,141,.15)}
   #bcard .ar{display:flex;align-items:center;gap:8px;justify-content:space-between;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 9px}
-  #bcard .ar div{display:flex;flex-direction:column;gap:1px} #bcard .ar small{color:var(--mute);font-size:10px;font-weight:700} #bcard .ar small.c{color:var(--laser)} #bcard .ar.done{opacity:.7} #bcard .ar.done small.c{color:var(--gas)} #bcard .ar .btn{padding:7px 9px;font-size:10px;white-space:nowrap}
+  #bcard .ar div{display:flex;flex-direction:column;gap:1px} #bcard .ar small{color:var(--mute);font-size:10px;font-weight:700} #bcard .ar small.c{color:var(--laser)} #bcard .ar .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle} #bcard .ar.done{opacity:.7} #bcard .ar.done small.c{color:var(--gas)} #bcard .ar .btn{padding:7px 9px;font-size:10px;white-space:nowrap}
   /* account sheet */
   #acct{position:absolute;inset:0;background:rgba(6,10,30,.9);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
   #acct.on{display:flex}
@@ -195,7 +196,8 @@
       <div class="pill cry"><span class="ic"></span><span id="bCry">0</span></div>
       <div class="pill rel" id="bRel"></div>
     </div>
-    <div id="btitle"><span class="lab">HOME BASE</span><span class="h" id="bHall">Town Hall Lv 1</span><button class="cl offline" id="bCloud" title="Account"></button><button class="btn snd" id="bSnd">SOUND</button><button class="btn snd" id="bToday">TODAY</button><button class="btn snd" id="bRen">REN</button><button class="btn" id="bPlay">PLAY</button></div>
+    <div id="btitle"><span class="lab">HOME BASE</span><span class="h" id="bHall">Town Hall Lv 1</span><button class="cl offline" id="bCloud" title="Account"></button><button class="btn" id="bPlay">PLAY</button></div>
+    <div id="bacts"><button class="btn snd" id="bSnd">♪</button><button class="btn snd" id="bToday">TODAY</button><button class="btn snd" id="bGuns">GUNS</button><button class="btn snd" id="bRen">REN</button></div>
     <div id="bq"></div>
   </div>
   <div id="bcard"></div>
@@ -308,10 +310,10 @@ const ADDONS={
   array:   {nm:"Lens Array",  ic:"◇",lab:20,cost:{ore:1200,relics:{lens:3}}, sec:7200, fx:"Arcs to 2 more targets (lasers, beam) · range +30% (others)"},
 };
 const ADDON_KEYS=Object.keys(ADDONS);const addonSlots=()=>LV("lab")>=25?2:1;
-const LORE={perm:"Dug into bedrock — the tide can't take it. Stands on the island from wave 1 of every run.",tower:"The tide takes every gun when the sky passes. Old Tam keeps the pattern — every upgrade sharpens its power, range or speed, and relics from the rocks and ships become add-ons.",hero:"Ren fixes things. People are looking at her.",lab:"Tam's workshop. Relics that fall from broken rocks and downed ships are studied here and turned into gun add-ons."};
-function newB2(){const tr={};for(const k of TRACK_KEYS){tr[k]={lv:TRACKS[k].lv0===0?0:1,spec:null};if(TRACKS[k].tower)Object.assign(tr[k],{pow:0,rng:0,spd:0,fit:[]});}return {v:2,ore:0,gas:0,cry:0,relics:{seam:0,core:0,drill:0,lens:0},runs:0,tr,q:[],pos:{},addons:{},grid:15,last:Date.now()};}
+const LORE={perm:"Dug into bedrock — the tide can't take it. Stands on the island from wave 1 of every run.",tower:"The tide takes every field gun when the sky passes; only guns on bedrock foundations (built here, under GUNS) hold. Old Tam keeps the pattern — every upgrade sharpens its power, range or speed, and relics from the rocks and ships become add-ons.",hero:"Ren fixes things. People are looking at her.",lab:"Tam's workshop. Relics that fall from broken rocks and downed ships are studied here and turned into gun add-ons."};
+function newB2(){const tr={};for(const k of TRACK_KEYS){tr[k]={lv:TRACKS[k].lv0===0?0:1,spec:null};if(TRACKS[k].tower)Object.assign(tr[k],{pow:0,rng:0,spd:0,fit:[]});}return {v:2,ore:0,gas:0,cry:0,relics:{seam:0,core:0,drill:0,lens:0},runs:0,tr,q:[],pos:{},addons:{},guns:[],grid:15,last:Date.now()};}
 let B2=null;
-try{const raw=localStorage.getItem("holdfast.base2");if(raw){const b=JSON.parse(raw);B2=Object.assign(newB2(),b);B2.relics=Object.assign({seam:0,core:0,drill:0,lens:0},b.relics||{});const tr=newB2().tr;for(const k in tr)tr[k]=Object.assign(tr[k],(b.tr||{})[k]||{});B2.tr=tr;B2.q=Array.isArray(b.q)?b.q.filter(e=>TRACKS[e.k]||(e.k&&e.k.startsWith("addon:"))):[];B2.pos=(b.pos&&typeof b.pos==='object')?b.pos:{};B2.addons=(b.addons&&typeof b.addons==='object')?b.addons:{};if(b.grid!==15){B2.pos={};}B2.grid=15;for(const k of TRACK_KEYS){const o=B2.tr[k];if(TRACKS[k].tower){if(!Array.isArray(o.fit))o.fit=[];if(o.lv>1&&!(o.pow+o.rng+o.spd))o.pow=o.lv-1;}}}}catch(e){B2=null;}
+try{const raw=localStorage.getItem("holdfast.base2");if(raw){const b=JSON.parse(raw);B2=Object.assign(newB2(),b);B2.relics=Object.assign({seam:0,core:0,drill:0,lens:0},b.relics||{});const tr=newB2().tr;for(const k in tr)tr[k]=Object.assign(tr[k],(b.tr||{})[k]||{});B2.tr=tr;B2.q=Array.isArray(b.q)?b.q.filter(e=>TRACKS[e.k]||(e.k&&e.k.startsWith("addon:"))):[];B2.pos=(b.pos&&typeof b.pos==='object')?b.pos:{};B2.addons=(b.addons&&typeof b.addons==='object')?b.addons:{};if(b.grid!==15){B2.pos={};B2.guns=[];}B2.grid=15;B2.guns=Array.isArray(b.guns)?b.guns.filter(g=>g&&ITEMS[g.k]):[];for(const k of TRACK_KEYS){const o=B2.tr[k];if(TRACKS[k].tower){if(!Array.isArray(o.fit))o.fit=[];if(o.lv>1&&!(o.pow+o.rng+o.spd))o.pow=o.lv-1;}}}}catch(e){B2=null;}
 if(!B2){B2=newB2();try{const o=JSON.parse(localStorage.getItem("holdfast.base")||"null");if(o){const r=o.r||{};const cap=v=>Math.max(1,Math.min(50,v));B2.cry=o.bank||0;B2.runs=o.runs||0;B2.tr.hall.lv=cap(1+((o.hall||1)-1)*3+(r.log||0)*2);B2.tr.factory.lv=cap(1+(r.bal||0)*3);B2.tr.mine.lv=cap(1+(r.mine||0)*3);B2.tr.ren.lv=cap(1+(r.ren||0)*3);B2.tr.shelter.lv=cap(1+(r.hard||0)*3);}}catch(e){}}
 function saveB2(){B2.last=Date.now();try{localStorage.setItem("holdfast.base2",JSON.stringify(B2));}catch(e){}if(window.__CLOUD)window.__CLOUD.push();}
 const LV=k=>B2.tr[k].lv, SPEC=k=>B2.tr[k].spec;
@@ -646,7 +648,7 @@ function updateBar(b){if(!b.bar)return;const f=Math.max(0,b.hp/b.maxhp);b.bar.vi
 function place(key,cell,perm){const it=ITEMS[key];if(!perm){S.ore-=it.ore;S.gas-=it.gas;S.cry-=(it.cry||0);}if(cell.deco){world.remove(cell.deco);cell.deco=null;}const mesh=makeMesh(key);mesh.position.set(cell.x-HALF,cell.h,cell.z-HALF);if(it.type!=="tower")mesh.scale.set(1.22,1.22,1.22);mesh.traverse(o=>{if(o.isMesh)o.castShadow=true;});world.add(mesh);
   const hpm=100*MOD.hp*(perm?1+.02*perm.lv:1);const km=MOD.kind[it.kind]||{};
   const b={key,it,cell,mesh,hp:Math.round(hpm),maxhp:Math.round(hpm),cd:0,xp:0,lv:1,tier:1,pips:[],dps:it.dps||0,rng:((it.rng||0)+(km.rng||0))*(km.rngMul||1),oreW:it.oreW||0,gasW:it.gasW||0,house:it.house||0,food:it.food||0,workers:it.workers||0};
-  if(perm){b.perm=true;b.track=perm.k;b.idx=perm.idx||0;b.plv=perm.lv;Object.assign(b,permStats(perm.k,perm.lv,perm.spec));b.workers=Math.ceil((it.workers||0)/2);levelRings(mesh,perm.lv);}
+  if(perm){b.perm=true;b.plv=perm.lv;if(perm.gun!==undefined){b.gun=perm.gun;b.anchored=true;b.hp=b.maxhp=Math.round(hpm*1.5);const g=B2.guns[perm.gun];b.xp=g.xp||0;b.lv=g.lv||1;for(let l=2;l<=b.lv;l++){const pip=new THREE.Mesh(new THREE.BoxGeometry(.14,.14,.14),new THREE.MeshBasicMaterial({color:0xFFD34D}));pip.position.set(-.35+(l-2)*.18,1.75,-.3);mesh.add(pip);b.pips.push(pip);}const fnd=new THREE.Mesh(new THREE.BoxGeometry(.98,.14,.98),mat(0x4F5872));fnd.position.y=.5;mesh.add(fnd);}else{b.track=perm.k;b.idx=perm.idx||0;Object.assign(b,permStats(perm.k,perm.lv,perm.spec));b.workers=Math.ceil((it.workers||0)/2);levelRings(mesh,perm.lv);}}
   cell.b=b;S.buildings.push(b);addBar(b);if(!perm&&it.type==="tower"){bumpBounty("guns");showRing(mesh.position.x,mesh.position.z,cell.h,towerReach(b),it.col);ringT=1.6;}if(b.house)S.house+=b.house;if(b.food)S.food+=b.food;recalc();if(!perm){tip(it.nm+" built");sfx.build();if(it.factory){popText(mesh.position,"FACTORY ONLINE — Tier 3 unlocked","combo");updateCards();}if(it.beacon){summonNeighbour();}}}
 // ---------- neighbour island (Chapter 2) ----------
 function summonNeighbour(){if(S.neighbour)return;const g=new THREE.Group();const ox=HALF+6,oz=-3;
@@ -676,7 +678,7 @@ function tryUpgrade(b){const u=upgradeCost(b);if(!u){tip("Max tier");return;}if(
   const ring=new THREE.Mesh(new THREE.BoxGeometry(.7,.08,.7),new THREE.MeshBasicMaterial({color:b.tier===2?0xC0C8D8:0xFFD34D}));ring.position.y=.5+(b.tier-2)*.1;b.mesh.add(ring);
   popText(b.mesh.position,b.it.nm+" → T"+b.tier,"combo");sfx.upgrade();showPanel(b);updateCards();}
 function showPanel(b){S.selB=b;const p=$("panel");if(!b||b.key==="hall"){p.classList.remove("show");return;}
-  const u=upgradeCost(b);$("pName").textContent=b.it.nm+" T"+b.tier+(b.it.type==="tower"?" · Lv"+b.lv:"")+(b.perm?" · BASE LV"+b.plv:"");
+  const u=upgradeCost(b);$("pName").textContent=b.it.nm+" T"+b.tier+(b.it.type==="tower"?" · Lv"+b.lv:"")+(b.anchored?" · ANCHORED":b.perm?" · BASE LV"+b.plv:"");
   const st=b.it.type==="tower"?`<b>${Math.round(b.dps*MOD.dmg*lvMult(b))}</b> DPS · <b>${Math.round(b.hp)}</b>/${b.maxhp} HP`:b.oreW?`<b>${b.oreW}</b> ore/wave · <b>${Math.round(b.hp)}</b> HP`:b.gasW?`<b>${b.gasW}</b> gas/wave · <b>${Math.round(b.hp)}</b> HP`:`<b>${Math.round(b.hp)}</b>/${b.maxhp} HP`;
   $("pStat").innerHTML=st;const btn=$("pUp");if(u){btn.style.display="";btn.textContent=`T${b.tier+1}: ${u.ore}${u.gas?" +"+u.gas+"g":""}${u.cry?" +"+u.cry+"c":""}${u.fac&&!hasFactory()?" (Factory)":""}`;btn.disabled=(u.fac&&!hasFactory())||S.ore<u.ore||S.gas<u.gas||S.cry<u.cry;}else{btn.style.display="none";}
   p.classList.add("show");}
@@ -710,7 +712,7 @@ $("bSkip").addEventListener("click",()=>{sfx.click();if(S.phase==="build")startC
 $("bSpeed").addEventListener("click",()=>{sfx.click();S.speed=S.speed>=3?1:S.speed+1;$("bSpeed").textContent=S.speed+"×";$("bSpeed").classList.toggle("on",S.speed>1);tip(S.speed>1?"Fast forward "+S.speed+"×":"Normal speed");});
 $("bRally").addEventListener("click",()=>{if(S.rallyCd>0)return;S.rallyT=COMBAT;S.rallyCd=120;recalc();tip("RALLY — everyone works +30% this wave");popText(S.hero.mesh.position,"RALLY!","combo");});
 // ---------- home base mode: the island itself, between runs ----------
-function bankRun(won){bumpBounty("run");if(won)bumpBounty("wins");const m=won?1:.5;const o=Math.max(0,Math.floor(S.ore*m)),g=Math.max(0,Math.floor(S.gas*m)),c=Math.max(0,Math.floor((S.cry+Math.floor(S.kills/8))*m));B2.ore+=o;B2.gas+=g;B2.cry+=c;B2.runs++;S.banked={o,g,c};saveB2();}
+function bankRun(won){bumpBounty("run");for(let i=0;i<B2.guns.length;i++){const b=S.buildings.find(x=>x.gun===i);const g=B2.guns[i];if(b){g.xp=Math.round(b.xp);g.lv=b.lv;}else{g.xp=0;g.lv=1;g.lost=(g.lost||0)+1;}}if(won)bumpBounty("wins");const m=won?1:.5;const o=Math.max(0,Math.floor(S.ore*m)),g=Math.max(0,Math.floor(S.gas*m)),c=Math.max(0,Math.floor((S.cry+Math.floor(S.kills/8))*m));B2.ore+=o;B2.gas+=g;B2.cry+=c;B2.runs++;S.banked={o,g,c};saveB2();}
 function goBase(){try{localStorage.setItem("holdfast.mode","base");}catch(e){}location.reload();}
 function goPlay(){try{localStorage.removeItem("holdfast.mode");localStorage.removeItem("holdfast.start");}catch(e){}location.reload();}
 window.__openBase=goBase;window.__B2=B2;
@@ -764,16 +766,17 @@ function basePointer(e){if(!downAt)return;const d=Math.hypot(e.clientX-downAt[0]
   ptr.x=(e.clientX/innerWidth)*2-1;ptr.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(ptr,cam);
   if(ray.intersectObject(S.hero.mesh,true).length){bSel="ren";renderCard();sfx.click();return;}
   const all=[S.hall,...S.buildings];const bh=ray.intersectObjects(all.map(b=>b.mesh),true);
+  if(S.placingGun||S.movingGun!==undefined&&S.movingGun!==null){const hits=ray.intersectObjects(cellMesh,false);if(!hits.length){S.placingGun=null;S.movingGun=null;tip("Cancelled");return;}const cell=hits[0].object.userData.cell;const r=S.placingGun?buildGun(S.placingGun,cell):moveGun(S.movingGun,cell);if(r){tip(r);sfx.deny();}else{sfx.build();tip(S.placingGun?ITEMS[S.placingGun].nm+" foundation laid":"Gun moved");S.placingGun=null;S.movingGun=null;renderBaseHud();}return;}
   if(S.moving){const mv=S.moving;const hits=ray.intersectObjects(cellMesh,false);if(!hits.length){S.moving=null;tip("Move cancelled");return;}const cell=hits[0].object.userData.cell;if(cell.b&&cell.b.track===mv.k&&(cell.b.idx||0)===mv.i){S.moving=null;tip("Move cancelled");return;}const w=moveTrack(mv.k,mv.i,cell);if(w){tip(w);sfx.deny();}else{S.moving=null;sfx.build();tip(TRACKS[mv.k].nm+" moved");bSel=mv.k;renderCard();}return;}
-  if(bh.length){let o=bh[0].object,b=null;while(o&&!b){b=all.find(x=>x.mesh===o)||null;o=o.parent;}if(b&&b.track){bSel=b.track;bSelIdx=b.idx||0;renderCard();sfx.click();return;}}
-  const hits=ray.intersectObjects(cellMesh,false);if(hits.length){const cell=hits[0].object.userData.cell;if(cell.b&&cell.b.track){bSel=cell.b.track;bSelIdx=cell.b.idx||0;renderCard();sfx.click();return;}}
+  if(bh.length){let o=bh[0].object,b=null;while(o&&!b){b=all.find(x=>x.mesh===o)||null;o=o.parent;}if(b&&b.gun!==undefined){sfx.click();renderGunCard(b.gun);return;}if(b&&b.track){bSel=b.track;bSelIdx=b.idx||0;renderCard();sfx.click();return;}}
+  const hits=ray.intersectObjects(cellMesh,false);if(hits.length){const cell=hits[0].object.userData.cell;if(cell.b&&cell.b.gun!==undefined){sfx.click();renderGunCard(cell.b.gun);return;}if(cell.b&&cell.b.track){bSel=cell.b.track;bSelIdx=cell.b.idx||0;renderCard();sfx.click();return;}}
   bSel=null;renderCard();}
 function initBase(){$("screen").classList.add("hide");$("hud").style.display="none";$("cards").style.display="none";$("actions").style.display="none";$("bhud").classList.add("on");
   const hrs=Math.min(8,Math.max(0,(Date.now()-(B2.last||Date.now()))/3.6e6));
   if(hrs>=.05){let o=0,g=0;for(const b of S.buildings){if(b.perm){o+=(b.oreW||0)*2*hrs;g+=(b.gasW||0)*2*hrs;}}o=Math.round(o);g=Math.round(g);if(o||g){B2.ore+=o;B2.gas+=g;saveB2();setTimeout(()=>tip(`While you were away (${hrs.toFixed(1)}h): +${o} ore, +${g} gas`),700);}}
   S.hero.tx=S.hero.x;S.hero.tz=S.hero.z;S.camVel=.004;AUDIO.music("intro");renderBaseHud();if(!B2.seenBase){B2.seenBase=true;saveB2();setTimeout(()=>tip("Tap a building, gun pad or Ren to upgrade — green arrow = ready"),1500);}
-  $("bPlay").addEventListener("click",()=>{sfx.click();goPlay();});$("bRen").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel="ren";renderCard();});$("bToday").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel=null;renderDaily();});ensureDaily();if(dailyReady())setTimeout(()=>tip("Supply drop and bounties waiting — tap TODAY"),2600);
-  $("bSnd").addEventListener("click",()=>{sfx.unlock();const m=AUDIO.cycle();$("bSnd").textContent=m===2?"SOUND":m===1?"SFX ONLY":"MUTED";});
+  $("bPlay").addEventListener("click",()=>{sfx.click();goPlay();});$("bRen").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel="ren";renderCard();});$("bToday").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel=null;renderDaily();});$("bGuns").addEventListener("click",()=>{sfx.unlock();sfx.click();renderGuns();});ensureDaily();if(dailyReady())setTimeout(()=>tip("Supply drop and bounties waiting — tap TODAY"),2600);
+  $("bSnd").addEventListener("click",()=>{sfx.unlock();const m=AUDIO.cycle();$("bSnd").textContent=m===2?"♪":m===1?"SFX":"✕";});
   window.__base={research:researchAddon,fit:fitAddon,addons:ADDONS,move:(k,i,x,z)=>moveTrack(k,i,cellAt(x,z)),sel:k=>{bSel=k;renderCard();},up:startUp,hurry:k=>{const r=hurry(k);if(!r)applyDone([k]);renderBaseHud();return r;},spec:setSpec,why,cost:upCost,time:upTime,hud:renderBaseHud,tick:baseTick};}
 // ---------- accounts + cloud save (Firebase Auth + Firestore; optional — the game runs fully offline without it) ----------
 // Config comes from window.HOLDFAST_FIREBASE (www/firebase-config.js in the app bundle). No config → the account screen explains how to set it up.
@@ -790,7 +793,7 @@ const CLOUD=(()=>{
   // ----- merge rules: keep the best of both saves -----
   function mergeB2(a,b){if(!a)return b;if(!b)return a;const r=JSON.parse(JSON.stringify(a));for(const k in r.tr){const x=(b.tr||{})[k]||{};r.tr[k].lv=Math.max(r.tr[k].lv||0,x.lv||0);r.tr[k].spec=r.tr[k].spec||x.spec||null;for(const s of ["pow","rng","spd"])if(r.tr[k][s]!==undefined||x[s]!==undefined)r.tr[k][s]=Math.max(r.tr[k][s]||0,x[s]||0);if(r.tr[k].fit||x.fit)r.tr[k].fit=[...new Set([...(r.tr[k].fit||[]),...(x.fit||[])])].slice(0,2);}r.addons=Object.assign({},b.addons||{},a.addons||{});
     for(const k of ["ore","gas","cry","runs"])r[k]=Math.max(a[k]||0,b[k]||0);for(const k in r.relics)r.relics[k]=Math.max(a.relics[k]||0,(b.relics||{})[k]||0);
-    const q=[...(a.q||[])];for(const e of (b.q||[]))if(!q.some(x=>x.k===e.k))q.push(e);r.q=q.filter(e=>r.tr[e.k]&&r.tr[e.k].lv<50);r.last=Math.max(a.last||0,b.last||0);r.pos=Object.assign({},b.pos||{},a.pos||{});return r;}
+    const q=[...(a.q||[])];for(const e of (b.q||[]))if(!q.some(x=>x.k===e.k))q.push(e);r.q=q.filter(e=>r.tr[e.k]&&r.tr[e.k].lv<50);r.last=Math.max(a.last||0,b.last||0);r.pos=Object.assign({},b.pos||{},a.pos||{});const gs=[...(a.guns||[])];for(const g of (b.guns||[])){const s=gs.find(x=>x.x===g.x&&x.z===g.z);if(!s)gs.push(g);else if((g.xp||0)>(s.xp||0)){s.xp=g.xp;s.lv=g.lv;}}r.guns=gs;return r;}
   function mergeSave(a,b){a=a||{};b=b||{};return {ch2:!!(a.ch2||b.ch2),ch3:!!(a.ch3||b.ch3),heroLv:Math.max(a.heroLv||1,b.heroLv||1),cry:Math.max(a.cry||0,b.cry||0),ch1Stars:Math.max(a.ch1Stars||0,b.ch1Stars||0)};}
   const local=()=>{let b=null,s=null;try{b=JSON.parse(localStorage.getItem("holdfast.base2")||"null");s=JSON.parse(localStorage.getItem("holdfast.save")||"null");}catch(e){}return {b,s};};
   const doc=()=>fb.firestore().collection("players").doc(user.uid);
@@ -896,6 +899,35 @@ function cancelNotify(id){try{const P=window.Capacitor&&window.Capacitor.Plugins
 const notifId=k=>{let h=7;for(const c of k)h=(h*31+c.charCodeAt(0))&0x7fffffff;return h%100000+1;};
 if(!S.baseMode){try{ensureDaily();if(dailyReady()){$("bBase").classList.add("hot");$("bBase").textContent="HOME BASE ●";}}catch(e){}}
 window.__daily={ensure:ensureDaily,bump:bumpBounty,claim:claimDaily,claimB:claimBounty,ready:dailyReady,next:nextGoal,pct:islandPct,render:renderDaily};
+// ---------- anchored guns: built at the Home Base on bedrock foundations, they stand from wave 1 of every run ----------
+const gunSlots=()=>2+Math.floor(LV("hall")/5);
+const gunCost=k=>{const it=ITEMS[k];return {ore:it.ore*2,gas:it.gas*2,cry:it.cry||0,relics:{}};};
+function gunWhy(k){const it=ITEMS[k];if(!it||it.type!=="tower")return "Not a gun";if(LV(k)<=0)return `No ${it.nm} pattern yet`;if(B2.guns.length>=gunSlots())return `All ${gunSlots()} foundations used — more at Town Hall Lv${(Math.floor(LV("hall")/5)+1)*5}`;const c=gunCost(k);if(B2.ore<c.ore)return `Need ${c.ore} ore`;if(B2.gas<c.gas)return `Need ${c.gas} gas`;if(B2.cry<c.cry)return `Need ${c.cry} crystal`;return null;}
+function gunCanPlace(cell){if(!cell.buildable||cell.kind==="water")return "Can't build there";if(cell.b)return "Occupied";if(cell.kind==="vein"||cell.kind==="vent")return "Save that cell for a "+(cell.kind==="vein"?"mine":"gas rig");return null;}
+function buildGun(k,cell){const w=gunWhy(k)||gunCanPlace(cell);if(w)return w;const c=gunCost(k);B2.ore-=c.ore;B2.gas-=c.gas;B2.cry-=c.cry;B2.guns.push({k,x:cell.x,z:cell.z});saveB2();placeGun(B2.guns.length-1,true);return null;}
+function scrapGun(i){const g=B2.guns[i];if(!g)return "No such gun";const c=gunCost(g.k);B2.ore+=Math.floor(c.ore/2);B2.gas+=Math.floor(c.gas/2);B2.cry+=Math.floor(c.cry/2);removeGunMesh(i);B2.guns.splice(i,1);saveB2();for(const b of S.buildings)if(b.gun!==undefined&&b.gun>i)b.gun--;return null;}
+function moveGun(i,cell){const w=gunCanPlace(cell);if(w)return w;removeGunMesh(i);B2.guns[i].x=cell.x;B2.guns[i].z=cell.z;saveB2();placeGun(i,true);return null;}
+function removeGunMesh(i){const b=S.buildings.find(x=>x.gun===i);if(!b)return;world.remove(b.mesh);b.cell.b=null;S.buildings=S.buildings.filter(x=>x!==b);}
+function placeGun(i,base){const g=B2.guns[i];const c=cellAt(g.x,g.z);if(!c||c.b||!ITEMS[g.k])return;place(g.k,c,{k:null,gun:i,lv:LV(g.k),spec:SPEC(g.k)});}
+function placeGuns(base){for(let i=0;i<B2.guns.length;i++)placeGun(i,base);}
+function renderGuns(){const el=$("bcard");rangeRing.visible=false;bSel=null;const n=B2.guns.length,sl=gunSlots();
+  const rows=["cannon","laser","missile","railgun","beam"].map(k=>{const it=ITEMS[k];const w=gunWhy(k);const c=gunCost(k);return `<div class="ar"><div><b><span class="sw" style="background:#${it.col.toString(16).padStart(6,"0")}"></span>${it.nm}</b><small>${it.dps} DPS · reach ${it.rng} · ${it.workers} crew</small><small class="c">${fmtCost(c)}</small></div><button class="btn ${w?"snd":""}" data-gun="${k}" ${w?"disabled":""}>BUILD</button></div>`;}).join("");
+  const have=B2.guns.map((g,i)=>`<div class="ar"><div><b>${ITEMS[g.k].nm}</b><small>Lv${g.lv||1} · ${Math.round(g.xp||0)} XP${g.lost?" · lost "+g.lost+"×":""} · keep it alive and its experience carries over</small></div><div class="bt"><button class="btn snd" data-gmove="${i}">MOVE</button><button class="btn snd" data-gscrap="${i}">SCRAP</button></div></div>`).join("");
+  el.innerHTML=`<div class="hd"><b>ANCHORED GUNS</b><span>${n} / ${sl} FOUNDATIONS · +${Math.floor(LV("hall")/5)===Math.floor(50/5)?0:1} AT HALL LV${(Math.floor(LV("hall")/5)+1)*5}</span><button class="x" data-x="1">✕</button></div>
+    <div class="lore">A gun on a bedrock foundation holds through the tide and stands from wave 1 of every run. Foundations cost double a field gun, paid from the bank. If one falls in a fight, the crews rebuild it on the foundation for the next run.</div>
+    ${have?`<div class="ad"><div class="lab">STANDING</div>${have}</div>`:""}
+    <div class="ad"><div class="lab">BUILD — then tap a cell</div>${rows}</div>`;
+  el.classList.add("show");el.querySelector("[data-x]").onclick=()=>{sfx.click();el.classList.remove("show");};
+  el.querySelectorAll("[data-gun]").forEach(b=>b.onclick=()=>{const w=gunWhy(b.dataset.gun);if(w){tip(w);sfx.deny();return;}sfx.click();S.placingGun=b.dataset.gun;el.classList.remove("show");tip("Tap a cell for the "+ITEMS[b.dataset.gun].nm+" foundation");});
+  el.querySelectorAll("[data-gmove]").forEach(b=>b.onclick=()=>{sfx.click();S.movingGun=+b.dataset.gmove;el.classList.remove("show");tip("Tap a cell to move the "+ITEMS[B2.guns[+b.dataset.gmove].k].nm);});
+  el.querySelectorAll("[data-gscrap]").forEach(b=>b.onclick=()=>{const r=scrapGun(+b.dataset.gscrap);if(r){tip(r);sfx.deny();}else{sfx.build();tip("Scrapped — half the cost returned");}renderGuns();renderBaseHud();});}
+function renderGunCard(i){const g=B2.guns[i];if(!g){renderGuns();return;}const el=$("bcard");const k=g.k,it=ITEMS[k];const km=MOD.kind[k]||{};const c=cellAt(g.x,g.z);if(c)showRing(c.x-HALF,c.z-HALF,c.h,((it.rng||0)+(km.rng||0))*(km.rngMul||1),it.col);
+  el.innerHTML=`<div class="hd"><b>ANCHORED · ${it.nm}</b><span>FOUNDATION ${i+1} / ${gunSlots()} · PATTERN ${LV(k)}</span><button class="x" data-x="1">✕</button></div><div class="lore">Stands from wave 1 of every run. Its power, range and speed follow the ${it.nm} pattern — upgrade that on the gun pad.</div><div class="fx">${trackFx(k,LV(k))} · reach ${(((it.rng||0)+(km.rng||0))*(km.rngMul||1)).toFixed(1)} cells (ring shown)</div><div class="bt"><button class="btn snd" data-pat="${k}">PATTERN</button><button class="btn snd" data-gmove="${i}">MOVE</button><button class="btn snd" data-gscrap="${i}">SCRAP</button></div>`;
+  el.classList.add("show");el.querySelector("[data-x]").onclick=()=>{sfx.click();rangeRing.visible=false;el.classList.remove("show");};
+  el.querySelector("[data-pat]").onclick=()=>{sfx.click();bSel=k;renderCard();};
+  el.querySelector("[data-gmove]").onclick=()=>{sfx.click();S.movingGun=i;rangeRing.visible=false;el.classList.remove("show");tip("Tap a cell to move the "+it.nm);};
+  el.querySelector("[data-gscrap]").onclick=()=>{const r=scrapGun(i);rangeRing.visible=false;if(r){tip(r);sfx.deny();}else{sfx.build();tip("Scrapped — half the cost returned");}el.classList.remove("show");renderBaseHud();};}
+window.__guns={build:(k,x,z)=>buildGun(k,cellAt(x,z)),scrap:scrapGun,move:(i,x,z)=>moveGun(i,cellAt(x,z)),why:gunWhy,slots:gunSlots,render:renderGuns};
 for(const i of [0,1]){$("bNext"+i).addEventListener("click",()=>{sfx.unlock();AUDIO.music("intro");sfx.build();document.querySelectorAll("#screen .slide").forEach(sl=>sl.classList.toggle("on",+sl.dataset.i===i+1));S.camAngle+=.9;});}
 $("bStart").addEventListener("click",()=>{sfx.unlock();$("screen").classList.add("hide");S.started=true;S.camVel=.02;startBuild();sfx.build();if(S.rested)setTimeout(()=>banner("RESTED CREWS","+25% mine and rig income for 3 waves"),600);if(B2.runs>0)setTimeout(()=>{if(!S.over)tip("The tide took last run's guns — the foundations and Tam's patterns held");},1200);});
 if(SAVE.ch2&&S.ch===1){$("bCh2").style.display="";$("bCh2").addEventListener("click",()=>{try{localStorage.setItem("holdfast.start","2");}catch(e){}location.reload();});}
@@ -948,7 +980,7 @@ function spawnPod(n){const g=new THREE.Group();const c=new THREE.Mesh(new THREE.
 window.__damageAt=(c,a,p)=>damageAt(c,a,p);function damageAt(cell,amt,pos){sfx.hit();if(cell.b)S.hurtThisWave=true;
   if(cell.b){const b=cell.b;b.hp-=amt;updateBar(b);if(b.key==="hall"){popText(pos,"TOWN HALL −"+amt,"bad");if(b.hp<=0){lose();return;}}
     else{popText(pos,b.it.nm+" −"+amt,"bad");if(b.it.workers&&S.pop>0&&Math.random()<.5){popText(pos.clone().add(new THREE.Vector3(.5,0,0)),"worker injured","bad");}
-      if(b.hp<=0){popText(pos,b.it.nm+" destroyed","bad");destroyBuilding(b);}else{b.mesh.rotation.z=(b.hp/b.maxhp-1)*.25;}}
+      if(b.hp<=0){popText(pos,b.it.nm+(b.anchored?" destroyed — its experience is lost":" destroyed"),"bad");destroyBuilding(b);}else{b.mesh.rotation.z=(b.hp/b.maxhp-1)*.25;}}
   } else {cell.crater=3;cell.mesh.material=M.stone;if(cell.detail)cell.detail.visible=false;}
   const h=S.hero;if(Math.hypot(h.x-(cell.x-HALF),h.z-(cell.z-HALF))<.8){h.down=6;h.post=null;popText(h.mesh.position,"Ren is down!","bad");}
 }
@@ -982,7 +1014,7 @@ function fire(b,en,dt){const it=b.it;const km=MOD.kind[it.kind]||{dmg:1,splash:1
     if(b.mesh.userData.turret){b.mesh.userData.turret.lookAt(to);}
   }}
 function beam(a,b,col,life){const g=new THREE.BufferGeometry().setFromPoints([a,b]);const l=new THREE.Line(g,new THREE.LineBasicMaterial({color:col}));world.add(l);S.shots.push({l,t:life});}
-function tide(){S.tide=0;const guns=S.buildings.filter(b=>b.it.type==="tower");if(guns.length){banner("THE TIDE","The sky passes. The guns go up. The pads hold.","alien");}}
+function tide(){S.tide=0;const guns=S.buildings.filter(b=>b.it.type==="tower"&&!b.anchored);if(guns.length){banner("THE TIDE","The sky passes. The guns go up. The pads hold.","alien");}}
 function win(){S.over=true;AUDIO.music("win");sfx.win();bankRun(true);tide();saveGame(S.ch===1?{ch2:true,heroLv:S.heroLv,cry:S.cry,ch1Stars:Math.min(3,(S.lost===0?1:0)+(S.hall.hp>=S.hall.maxhp*.5?1:0)+1)}:{ch3:true,heroLv:S.heroLv,cry:S.cry});
   setTimeout(()=>screen(S.ch===1?"CHAPTER 1 — HOLDFAST":"CHAPTER 2 — NEIGHBOURS",S.ch===1?`They pulled back. ${S.pop} of you now, on a rock that used to be a town. HOLD has been hearing voices on the old radio — other islands, other survivors.`:`The machine is scrap on the seam. Marrow Hill is cheering across the bridge. And Dov was right: the crystal was under us all along. Whatever ended the world came for it — and it's still out there, still pulling pieces of home up into the dark.`,"island"),2600);}
 function lose(){S.over=true;AUDIO.music("lose");sfx.lose();bankRun(false);tide();setTimeout(()=>screen("THE HALL IS GONE",`Wave ${S.wave+1}. ${S.pop} people and nowhere to stand. Mine first, house the pods before they land, and keep Ren near whatever's taking hits.`,""),2200);}
@@ -1061,7 +1093,7 @@ function step(now){const raw=Math.min(.05,(now-last)/1000);last=now;requestAnima
     heroCheck();
   }
   if(S.baseMode){const tk=(now/500)|0;if(tk!==lastBaseTick){lastBaseTick=tk;baseTick();}for(const b of [S.hall,...S.buildings]){if(b.work){b.work.rotation.y+=dt*3;b.work.position.y=2.3+Math.sin(now*.004)*.12;}if(b.ready){b.ready.position.y=2.3+Math.sin(now*.005)*.1;}}}
-  if(S.tide!==undefined&&S.tide!==null){S.tide+=raw;for(const b of S.buildings){if(b.it.type!=="tower")continue;const k=Math.max(0,S.tide-.6);b.mesh.position.y=b.cell.h+k*k*1.6;b.mesh.rotation.y+=raw*(.4+k*.6);b.mesh.rotation.z=Math.sin(S.tide*2)*.12;}}
+  if(S.tide!==undefined&&S.tide!==null){S.tide+=raw;for(const b of S.buildings){if(b.it.type!=="tower"||b.anchored)continue;const k=Math.max(0,S.tide-.6);b.mesh.position.y=b.cell.h+k*k*1.6;b.mesh.rotation.y+=raw*(.4+k*.6);b.mesh.rotation.z=Math.sin(S.tide*2)*.12;}}
   // reticle follows the lowest falling asteroid
   {let low=null;for(const en of S.enemies){if(en.fly||en.boss)continue;if(!low||en.mesh.position.y<low.mesh.position.y)low=en;}
     reticle.visible=retInner.visible=!!low&&S.phase==="combat";if(low){reticle.position.x=retInner.position.x=low.tx;reticle.position.z=retInner.position.z=low.tz;reticle.position.y=low.cell.h+.53;retInner.position.y=low.cell.h+.54;const sc=1+Math.sin(now*.012)*.12;reticle.scale.set(sc,sc,1);retInner.rotation.z+=dt*3;}}
@@ -1078,7 +1110,7 @@ function step(now){const raw=Math.min(.05,(now-last)/1000);last=now;requestAnima
   if(!downAt&&Math.abs(S.camVel)>0.0005){S.camAngle+=S.camVel;S.camVel*=0.92;}
   world.rotation.y=S.camAngle;world.updateMatrixWorld();
   R.render(scene,cam);}
-placePermanent(S.baseMode);if(S.baseMode)initBase();recalc();requestAnimationFrame(step);
+placePermanent(S.baseMode);placeGuns(S.baseMode);if(S.baseMode)initBase();recalc();requestAnimationFrame(step);
 })();
 </script>
 
