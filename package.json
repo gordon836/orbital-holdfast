@@ -12,9 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@capacitor-community/apple-sign-in": "^6.0.0",
     "@capacitor/cli": "^6.2.2",
     "@capacitor/core": "^6.2.2",
-    "@capacitor/ios": "^6.2.2"
+    "@capacitor/ios": "^6.2.2",
+    "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5"
