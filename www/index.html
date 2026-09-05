@@ -17,6 +17,7 @@
     --display:'Bungee', 'Arial Black', sans-serif; --body:'Nunito', 'Segoe UI', Arial, sans-serif;
   }
   html,body{height:100%;margin:0;background:var(--space);color:var(--ink);font-family:var(--body);overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:none}
+  input,textarea{touch-action:auto}
   #wrap{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--space)}
   canvas{display:block}
   #gl{position:absolute;inset:0;width:100%!important;height:100%!important}
@@ -122,6 +123,20 @@
   #bcard .sp .btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
   #bcard .sp .btn small{font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:0;text-transform:none}
   #bcard .bt{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+  /* account sheet */
+  #acct{position:absolute;inset:0;background:rgba(6,10,30,.9);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+  #acct.on{display:flex}
+  #acct .bx{width:100%;max-width:400px;background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:700}
+  #acct .hd{display:flex;align-items:center;gap:8px}#acct .hd b{font-family:var(--display);font-size:14px;color:var(--gold)}#acct .hd span{flex:1;font-size:10px;letter-spacing:1px;color:var(--mute)}
+  #acct .x{background:none;border:0;color:var(--mute);font-size:16px;cursor:pointer}
+  #acct p{margin:0;line-height:1.4}#acct p.m{color:var(--mute);font-size:12px}#acct .bad{color:var(--bad)}
+  #acct .prov{display:flex;flex-direction:column;gap:6px}#acct .prov .btn{font-family:var(--body);font-size:14px;font-weight:800;letter-spacing:0;text-align:center}
+  #acct .or{text-align:center;font-size:10px;letter-spacing:2px;color:var(--mute);margin:2px 0}
+  #acct input{background:#0a0f26;border:2px solid var(--line);border-radius:10px;color:var(--ink);padding:10px;font-family:var(--body);font-size:15px;font-weight:700;-webkit-user-select:text;user-select:text}
+  #acct .bt{display:flex;gap:8px;justify-content:flex-end}#acct .lnk{background:none;border:0;color:var(--laser);font-family:var(--body);font-weight:800;font-size:12px;cursor:pointer;align-self:flex-start;padding:0}
+  #acct .err{color:var(--bad);font-size:12px;min-height:14px}
+  .cl{width:14px;height:14px;border-radius:50%;border:2px solid var(--mute);background:transparent;padding:0;cursor:pointer;flex:none}
+  .cl.signed-out{border-color:var(--gold)} .cl.signed-in,.cl.synced{background:var(--gas);border-color:var(--gas)} .cl.error{background:var(--bad);border-color:var(--bad)}
   /* overlay screens */
   #screen{position:absolute;inset:0;background:rgba(6,10,30,.88);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
   #screen .box{max-width:360px;display:flex;flex-direction:column;gap:14px;align-items:center}
@@ -170,16 +185,18 @@
       <div class="pill cry"><span class="ic"></span><span id="bCry">0</span></div>
       <div class="pill rel" id="bRel"></div>
     </div>
-    <div id="btitle"><span class="lab">HOME BASE</span><span class="h" id="bHall">Town Hall Lv 1</span><button class="btn snd" id="bSnd">SOUND</button><button class="btn snd" id="bRen">REN</button><button class="btn" id="bPlay">PLAY</button></div>
+    <div id="btitle"><span class="lab">HOME BASE</span><span class="h" id="bHall">Town Hall Lv 1</span><button class="cl offline" id="bCloud" title="Account"></button><button class="btn snd" id="bSnd">SOUND</button><button class="btn snd" id="bRen">REN</button><button class="btn" id="bPlay">PLAY</button></div>
     <div id="bq"></div>
   </div>
   <div id="bcard"></div>
+  <div id="acct"></div>
   <div id="screen"><div class="box">
-    <div class="slide on" data-i="0"><div class="art white"></div><h1>Orbital Holdfast</h1><p>Nobody saw what did it. One night the sky went white without a sound, and when it faded, the world was gone.</p><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn" id="bNext0">NEXT</button><button class="btn alt" id="bBase">HOME BASE</button></div></div>
+    <div class="slide on" data-i="0"><div class="art white"></div><h1>Orbital Holdfast</h1><p>Nobody saw what did it. One night the sky went white without a sound, and when it faded, the world was gone.</p><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn" id="bNext0">NEXT</button><button class="btn alt" id="bBase">HOME BASE</button><button class="btn snd" id="bAcct">ACCOUNT</button></div></div>
     <div class="slide" data-i="1"><div class="art island"></div><h1>What's left</h1><p>The hall. A few streets. The hill behind the school. Floating in the dark with the wreck of the planet turning slowly around it.</p><p class="mute">The rocks falling on you are pieces of home. Some of them carry a purple crystal nobody has seen before.</p><button class="btn" id="bNext1">NEXT</button></div>
     <div class="slide" data-i="2"><div class="art"></div><h1>Five of you</h1><p>You are Ren. You fix things. People are looking at you.</p><p class="mute">Tap a card, then a cell, to build. Tap the ground to send Ren; tap a building to post her, repair it, or upgrade it; tap a rock to make it her target. Reach the escape pods before the wave ends. Drag to spin and tilt. Survive ten waves.</p><p class="mute">Prototype — Day 6 of the sprint: story and boss.</p><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn" id="bStart">HOLD THE LINE</button><button class="btn alt" id="bCh2" style="display:none">CHAPTER 2</button></div></div>
   </div></div>
 </div>
+<script src="firebase-config.js"></script>
 <script src="three.min.js"></script>
 <script>
 (function(){
@@ -275,7 +292,7 @@ function newB2(){const tr={};for(const k of TRACK_KEYS)tr[k]={lv:TRACKS[k].lv0==
 let B2=null;
 try{const raw=localStorage.getItem("holdfast.base2");if(raw){const b=JSON.parse(raw);B2=Object.assign(newB2(),b);B2.relics=Object.assign({seam:0,core:0,drill:0,lens:0},b.relics||{});const tr=newB2().tr;for(const k in tr)tr[k]=Object.assign(tr[k],(b.tr||{})[k]||{});B2.tr=tr;B2.q=Array.isArray(b.q)?b.q.filter(e=>TRACKS[e.k]):[];}}catch(e){B2=null;}
 if(!B2){B2=newB2();try{const o=JSON.parse(localStorage.getItem("holdfast.base")||"null");if(o){const r=o.r||{};const cap=v=>Math.max(1,Math.min(50,v));B2.cry=o.bank||0;B2.runs=o.runs||0;B2.tr.hall.lv=cap(1+((o.hall||1)-1)*3+(r.log||0)*2);B2.tr.factory.lv=cap(1+(r.bal||0)*3);B2.tr.mine.lv=cap(1+(r.mine||0)*3);B2.tr.ren.lv=cap(1+(r.ren||0)*3);B2.tr.shelter.lv=cap(1+(r.hard||0)*3);}}catch(e){}}
-function saveB2(){B2.last=Date.now();try{localStorage.setItem("holdfast.base2",JSON.stringify(B2));}catch(e){}}
+function saveB2(){B2.last=Date.now();try{localStorage.setItem("holdfast.base2",JSON.stringify(B2));}catch(e){}if(window.__CLOUD)window.__CLOUD.push();}
 const LV=k=>B2.tr[k].lv, SPEC=k=>B2.tr[k].spec;
 function upCost(k){const L=Math.max(1,LV(k)),T=LV(k)+1,m=TRACKS[k].tower?.7:1;const c={ore:Math.round(50*Math.pow(L,1.55)*m),gas:L>=3?Math.round(12*Math.pow(L,1.5)*m):0,cry:L%5===0?L*2:0,relics:{}};
   if(T===10)c.relics.seam=1;if(T===25)c.relics[TRACKS[k].tower?"drill":"core"]=1;if(T===40)c.relics.lens=2;if(T===50){c.relics.seam=1;c.relics.core=1;c.relics.drill=1;c.relics.lens=1;}return c;}
@@ -307,7 +324,7 @@ const CH=CHAPTERS[startCh-1];const CW=()=>CH.waves;
 const S = {ch:CH.n,baseMode:BASEMODE,ore:CH.ore,gas:CH.gas,cry:startCh===2?Math.min(30,(SAVE.cry||0)):0,pop:CH.pop,house:CH.house+MOD.house,food:CH.food+MOD.food,wave:0,phase:"build",t:0,started:false,over:false,injured:[],rep:0,neighbour:null,dovDone:false,
   buildings:[],enemies:[],shots:[],loot:[],pods:[],hero:null,sel:null,combo:0,comboT:0,rallyT:0,rallyCd:0,
   staff:1,fed:1,out:1,kills:0,rescued:0,lost:0,heroXP:0,heroLv:startCh===2?Math.max(1,(SAVE.heroLv||1)):1,spawnQ:[],waveDone:false,speed:1};
-function saveGame(extra){try{const cur=JSON.parse(localStorage.getItem("holdfast.save")||"{}");localStorage.setItem("holdfast.save",JSON.stringify(Object.assign(cur,extra)));}catch(e){}}
+function saveGame(extra){try{const cur=JSON.parse(localStorage.getItem("holdfast.save")||"{}");localStorage.setItem("holdfast.save",JSON.stringify(Object.assign(cur,extra)));}catch(e){}if(window.__CLOUD)window.__CLOUD.push();}
 const TOWER_XP=[60,180,400,750,1e9]; // xp to reach Lv2..Lv5
 const lvMult=b=>1+.15*((b.lv||1)-1);
 window.__S=S;
@@ -633,6 +650,74 @@ function initBase(){$("screen").classList.add("hide");$("hud").style.display="no
   $("bPlay").addEventListener("click",()=>{sfx.click();goPlay();});$("bRen").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel="ren";renderCard();});
   $("bSnd").addEventListener("click",()=>{sfx.unlock();const m=AUDIO.cycle();$("bSnd").textContent=m===2?"SOUND":m===1?"SFX ONLY":"MUTED";});
   window.__base={sel:k=>{bSel=k;renderCard();},up:startUp,hurry:k=>{const r=hurry(k);if(!r)applyDone([k]);renderBaseHud();return r;},spec:setSpec,why,cost:upCost,time:upTime,hud:renderBaseHud,tick:baseTick};}
+// ---------- accounts + cloud save (Firebase Auth + Firestore; optional — the game runs fully offline without it) ----------
+// Config comes from window.HOLDFAST_FIREBASE (www/firebase-config.js in the app bundle). No config → the account screen explains how to set it up.
+const CLOUD=(()=>{
+  const cfg=window.HOLDFAST_FIREBASE||null;const VER="10.14.1";let fb=null,user=null,ready=null,pushT=0,status="offline",lastErr="";
+  const listeners=[];const onChange=f=>listeners.push(f);const emit=()=>{for(const f of listeners)f();};
+  const script=src=>new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("Could not load "+src));document.head.appendChild(s);});
+  async function load(){if(!cfg)throw new Error("Cloud saves are not configured yet");if(ready)return ready;
+    ready=(async()=>{if(!window.firebase){const base=`https://www.gstatic.com/firebasejs/${VER}/`;await script(base+"firebase-app-compat.js");await Promise.all([script(base+"firebase-auth-compat.js"),script(base+"firebase-firestore-compat.js")]);}
+      fb=window.firebase;if(!fb.apps.length)fb.initializeApp(cfg);
+      fb.auth().onAuthStateChanged(async u=>{user=u;status=u?"signed-in":"signed-out";emit();if(u){try{await pullAndMerge();}catch(e){lastErr=e.message;emit();}}});
+      return fb;})();
+    return ready;}
+  // ----- merge rules: keep the best of both saves -----
+  function mergeB2(a,b){if(!a)return b;if(!b)return a;const r=JSON.parse(JSON.stringify(a));for(const k in r.tr){const x=(b.tr||{})[k]||{};r.tr[k].lv=Math.max(r.tr[k].lv||0,x.lv||0);r.tr[k].spec=r.tr[k].spec||x.spec||null;}
+    for(const k of ["ore","gas","cry","runs"])r[k]=Math.max(a[k]||0,b[k]||0);for(const k in r.relics)r.relics[k]=Math.max(a.relics[k]||0,(b.relics||{})[k]||0);
+    const q=[...(a.q||[])];for(const e of (b.q||[]))if(!q.some(x=>x.k===e.k))q.push(e);r.q=q.filter(e=>r.tr[e.k]&&r.tr[e.k].lv<50);r.last=Math.max(a.last||0,b.last||0);return r;}
+  function mergeSave(a,b){a=a||{};b=b||{};return {ch2:!!(a.ch2||b.ch2),ch3:!!(a.ch3||b.ch3),heroLv:Math.max(a.heroLv||1,b.heroLv||1),cry:Math.max(a.cry||0,b.cry||0),ch1Stars:Math.max(a.ch1Stars||0,b.ch1Stars||0)};}
+  const local=()=>{let b=null,s=null;try{b=JSON.parse(localStorage.getItem("holdfast.base2")||"null");s=JSON.parse(localStorage.getItem("holdfast.save")||"null");}catch(e){}return {b,s};};
+  const doc=()=>fb.firestore().collection("players").doc(user.uid);
+  async function pullAndMerge(){const snap=await doc().get();const l=local();const rem=snap.exists?snap.data():{};
+    const mb=mergeB2(l.b,rem.base2||null),ms=mergeSave(l.s,rem.save||null);const changed=JSON.stringify(mb)!==JSON.stringify(l.b)||JSON.stringify(ms)!==JSON.stringify(l.s||{});
+    try{if(mb)localStorage.setItem("holdfast.base2",JSON.stringify(mb));localStorage.setItem("holdfast.save",JSON.stringify(ms));}catch(e){}
+    await doc().set({base2:mb||null,save:ms,updatedAt:Date.now(),email:user.email||null,name:user.displayName||null,platform:navigator.userAgent.slice(0,80)},{merge:true});
+    status="synced";emit();if(changed&&!S.started){setTimeout(()=>location.reload(),900);}return changed;}
+  function push(){if(!user||!fb)return;clearTimeout(pushT);pushT=setTimeout(async()=>{try{const l=local();await doc().set({base2:l.b||null,save:l.s||{},updatedAt:Date.now()},{merge:true});status="synced";lastErr="";}catch(e){lastErr=e.message;status="error";}emit();},1500);}
+  const native=()=>(window.Capacitor&&window.Capacitor.Plugins)||{};
+  async function signInApple(){await load();const P=native().SignInWithApple;
+    if(P){const nonce=Math.random().toString(36).slice(2)+Date.now().toString(36);const hashed=await sha256(nonce);const r=await P.authorize({clientId:cfg.appleClientId||location.hostname,redirectURI:cfg.appleRedirect||"https://"+cfg.authDomain+"/__/auth/handler",scopes:"email name",nonce:hashed});
+      const cred=new fb.auth.OAuthProvider("apple.com").credential({idToken:r.response.identityToken,rawNonce:nonce});await fb.auth().signInWithCredential(cred);}
+    else{const p=new fb.auth.OAuthProvider("apple.com");p.addScope("email");p.addScope("name");await fb.auth().signInWithPopup(p);}}
+  async function signInGoogle(){await load();const P=native().GoogleAuth;
+    if(P){const r=await P.signIn();const cred=fb.auth.GoogleAuthProvider.credential(r.authentication.idToken);await fb.auth().signInWithCredential(cred);}
+    else{await fb.auth().signInWithPopup(new fb.auth.GoogleAuthProvider());}}
+  async function sha256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}
+  async function emailCreate(email,pw){await load();const r=await fb.auth().createUserWithEmailAndPassword(email,pw);try{await r.user.sendEmailVerification();}catch(e){}}
+  async function emailSignIn(email,pw){await load();await fb.auth().signInWithEmailAndPassword(email,pw);}
+  async function emailReset(email){await load();await fb.auth().sendPasswordResetEmail(email);}
+  async function signOut(){if(fb)await fb.auth().signOut();const P=native().GoogleAuth;if(P){try{await P.signOut();}catch(e){}}}
+  return {configured:!!cfg,load,onChange,push,signInApple,signInGoogle,emailCreate,emailSignIn,emailReset,signOut,user:()=>user,status:()=>status,err:()=>lastErr,_merge:{mergeB2,mergeSave}};
+})();
+window.__CLOUD=CLOUD;
+// ----- account sheet -----
+function accountMsg(e){const m=(e&&e.message)||String(e);const code=(e&&e.code)||"";const map={"auth/email-already-in-use":"That email already has an account — sign in instead.","auth/invalid-email":"That doesn't look like an email address.","auth/weak-password":"Password needs at least 6 characters.","auth/wrong-password":"Wrong password.","auth/invalid-credential":"Wrong email or password.","auth/user-not-found":"No account with that email.","auth/popup-blocked":"Pop-up blocked — open the game in the app or allow pop-ups.","auth/operation-not-allowed":"That sign-in method isn't enabled in Firebase yet.","auth/network-request-failed":"No connection."};return map[code]||m.replace(/^Firebase: /,"").replace(/\(auth.*\)\.?$/,"").trim();}
+function renderAccount(){const el=$("acct");if(!el.classList.contains("on"))return;const u=CLOUD.user();const st=CLOUD.status();
+  const head=`<div class="hd"><b>ACCOUNT</b><span>${!CLOUD.configured?"NOT SET UP":u?(st==="synced"?"CLOUD SAVE ON":st==="error"?"SYNC ERROR":"SIGNED IN"):"SAVE TO THE CLOUD"}</span><button class="x" data-x="1">✕</button></div>`;
+  let body;
+  if(!CLOUD.configured)body=`<p>Progress is saved on this device. Cloud accounts switch on once the Firebase config is added to the app bundle (see SETUP-ACCOUNTS.md in the repo).</p>`;
+  else if(u)body=`<p>Signed in as <b>${u.displayName||u.email||"Apple ID"}</b>${u.email?` · ${u.email}`:""}</p><p class="m">Your home base, chapters and Ren's level are saved to the cloud after every run and every upgrade, and merged onto any phone you sign in on.${CLOUD.err()?`<br><span class="bad">${accountMsg({message:CLOUD.err()})}</span>`:""}</p><div class="bt"><button class="btn snd" data-out="1">SIGN OUT</button></div>`;
+  else body=`<p class="m">Create an account to keep your island if you change phones. Progress already on this device is kept and merged.</p>
+    <div class="prov"><button class="btn snd" data-apple="1"> Sign in with Apple</button><button class="btn snd" data-google="1">G  Continue with Google</button></div>
+    <div class="or">OR WITH EMAIL</div>
+    <input id="acEmail" type="email" placeholder="email" autocomplete="username" inputmode="email"><input id="acPw" type="password" placeholder="password (6+)" autocomplete="current-password">
+    <div class="bt"><button class="btn alt" data-create="1">CREATE ACCOUNT</button><button class="btn" data-login="1">SIGN IN</button></div><button class="lnk" data-reset="1">Forgot password?</button>`;
+  el.innerHTML=`<div class="bx">${head}${body}<div class="err" id="acErr"></div></div>`;
+  const err=t=>{$("acErr").textContent=t;};const run=async f=>{err("Working…");try{await f();err("");renderAccount();}catch(e){err(accountMsg(e));sfx.deny();}};
+  el.querySelector("[data-x]").onclick=()=>{sfx.click();el.classList.remove("on");};
+  const q=s=>el.querySelector(s);
+  if(q("[data-out]"))q("[data-out]").onclick=()=>run(()=>CLOUD.signOut());
+  if(q("[data-apple]"))q("[data-apple]").onclick=()=>run(()=>CLOUD.signInApple());
+  if(q("[data-google]"))q("[data-google]").onclick=()=>run(()=>CLOUD.signInGoogle());
+  if(q("[data-create]"))q("[data-create]").onclick=()=>run(()=>CLOUD.emailCreate($("acEmail").value.trim(),$("acPw").value));
+  if(q("[data-login]"))q("[data-login]").onclick=()=>run(()=>CLOUD.emailSignIn($("acEmail").value.trim(),$("acPw").value));
+  if(q("[data-reset]"))q("[data-reset]").onclick=()=>run(async()=>{await CLOUD.emailReset($("acEmail").value.trim());tip("Reset email sent");});}
+function openAccount(){sfx.unlock();sfx.click();$("acct").classList.add("on");renderAccount();if(CLOUD.configured)CLOUD.load().then(renderAccount).catch(e=>{$("acErr").textContent=accountMsg(e);});}
+CLOUD.onChange(()=>{renderAccount();const d=$("bCloud");if(d)d.className="cl "+CLOUD.status();});
+for(const id of ["bAcct","bCloud"]){const e=$(id);if(e)e.addEventListener("click",openAccount);}
+window.__openAccount=openAccount;
+if(CLOUD.configured){CLOUD.load().catch(()=>{});}
 for(const i of [0,1]){$("bNext"+i).addEventListener("click",()=>{sfx.unlock();AUDIO.music("intro");sfx.build();document.querySelectorAll("#screen .slide").forEach(sl=>sl.classList.toggle("on",+sl.dataset.i===i+1));S.camAngle+=.9;});}
 $("bStart").addEventListener("click",()=>{sfx.unlock();$("screen").classList.add("hide");S.started=true;S.camVel=.02;startBuild();sfx.build();});
 if(SAVE.ch2&&S.ch===1){$("bCh2").style.display="";$("bCh2").addEventListener("click",()=>{try{localStorage.setItem("holdfast.start","2");}catch(e){}location.reload();});}
