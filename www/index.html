@@ -101,6 +101,9 @@
   #btitle .h{flex:1;font-size:11px;font-weight:800;color:var(--mute);line-height:1.2}
   #btitle .btn{padding:7px 9px;font-size:10px;box-shadow:0 3px 0 #9a4d00}
   #btitle .btn.snd{box-shadow:0 3px 0 #0a0f26}
+  #btitle .btn.hot{background:var(--gold);color:#1a0d00;border-color:var(--gold);box-shadow:0 3px 0 #9a6a00}
+  #bcard .ar .tr{height:6px;background:#0a0f26;border-radius:3px;overflow:hidden;margin:3px 0} #bcard .ar .f{height:100%;background:linear-gradient(90deg,var(--laser),var(--gas))}
+  #bBase.hot{box-shadow:0 4px 0 #1f5f8f,0 0 0 3px rgba(255,211,77,.6)}
   #bq{display:flex;flex-direction:column;gap:4px}
   #bq .qr{display:flex;align-items:center;gap:8px;background:rgba(20,28,63,.92);border:2px solid var(--line);border-radius:10px;padding:5px 10px;font-size:12px;font-weight:800;cursor:pointer}
   #bq .qr.idle{color:var(--mute);font-weight:700;cursor:default}
@@ -192,7 +195,7 @@
       <div class="pill cry"><span class="ic"></span><span id="bCry">0</span></div>
       <div class="pill rel" id="bRel"></div>
     </div>
-    <div id="btitle"><span class="lab">HOME BASE</span><span class="h" id="bHall">Town Hall Lv 1</span><button class="cl offline" id="bCloud" title="Account"></button><button class="btn snd" id="bSnd">SOUND</button><button class="btn snd" id="bRen">REN</button><button class="btn" id="bPlay">PLAY</button></div>
+    <div id="btitle"><span class="lab">HOME BASE</span><span class="h" id="bHall">Town Hall Lv 1</span><button class="cl offline" id="bCloud" title="Account"></button><button class="btn snd" id="bSnd">SOUND</button><button class="btn snd" id="bToday">TODAY</button><button class="btn snd" id="bRen">REN</button><button class="btn" id="bPlay">PLAY</button></div>
     <div id="bq"></div>
   </div>
   <div id="bcard"></div>
@@ -322,12 +325,12 @@ function gate(k){const L=LV(k),T=L+1;if(L>=50)return "Fully upgraded";const t=TR
   else{if(t.hallMin&&LV("hall")<t.hallMin)return `Unlocks at Town Hall Lv${t.hallMin}`;if(LV("hall")<T-2)return `Lv${T} needs Town Hall Lv${T-2}`;}
   return null;}
 function why(k){if(k.startsWith("addon:"))return addonWhy(k.slice(6));const g=gate(k);if(g)return g;if(B2.q.some(e=>e.k===k))return "Upgrading";if(B2.q.length>=maxQ())return `Crews busy — ${maxQ()} upgrades at a time`;const c=upCost(k);if(B2.ore<c.ore)return `Need ${c.ore} ore (bank ore by finishing runs)`;if(B2.gas<c.gas)return `Need ${c.gas} gas`;if(B2.cry<c.cry)return `Need ${c.cry} crystal`;for(const r in c.relics)if(B2.relics[r]<c.relics[r])return `Need ${c.relics[r]} ${RELIC[r].nm}${c.relics[r]>1?"es":""} — drops from ${RELIC[r].from}`;return null;}
-function startUp(k,stat){const w=why(k);if(w)return w;if(TRACKS[k].tower&&LV(k)>0&&!["pow","rng","spd"].includes(stat))return "Choose Power, Range or Speed";const c=upCost(k);B2.ore-=c.ore;B2.gas-=c.gas;B2.cry-=c.cry;for(const r in c.relics)B2.relics[r]-=c.relics[r];const d=upTime(k);B2.q.push({k,end:Date.now()+d*1000,dur:d,stat:TRACKS[k].tower&&LV(k)>0?stat:null});saveB2();return null;}
+function startUp(k,stat){const w=why(k);if(w)return w;if(TRACKS[k].tower&&LV(k)>0&&!["pow","rng","spd"].includes(stat))return "Choose Power, Range or Speed";const c=upCost(k);B2.ore-=c.ore;B2.gas-=c.gas;B2.cry-=c.cry;for(const r in c.relics)B2.relics[r]-=c.relics[r];const d=upTime(k);B2.q.push({k,end:Date.now()+d*1000,dur:d,stat:TRACKS[k].tower&&LV(k)>0?stat:null});saveB2();bumpBounty("up");notifyAt(notifId(k),TRACKS[k].nm+" is ready","Lv"+(LV(k)+1)+" finished at the Home Base",Date.now()+d*1000);return null;}
 function addonWhy(id){const a=ADDONS[id];if(!a)return "Unknown add-on";if(B2.addons[id])return "Researched";if(B2.q.some(e=>e.k==="addon:"+id))return "Researching";if(LV("lab")<a.lab)return `Needs Research Centre Lv${a.lab}`;if(B2.q.length>=maxQ())return `Crews busy — ${maxQ()} at a time`;if(B2.ore<a.cost.ore)return `Need ${a.cost.ore} ore`;for(const r in a.cost.relics)if(B2.relics[r]<a.cost.relics[r])return `Need ${a.cost.relics[r]} ${RELIC[r].nm}${a.cost.relics[r]>1?"s":""} — drops from ${RELIC[r].from}`;return null;}
-function researchAddon(id){const w=addonWhy(id);if(w)return w;const a=ADDONS[id];B2.ore-=a.cost.ore;for(const r in a.cost.relics)B2.relics[r]-=a.cost.relics[r];const d=Math.round(a.sec*(SPEC("ren")==="Engineer"?.85:1));B2.q.push({k:"addon:"+id,end:Date.now()+d*1000,dur:d});saveB2();return null;}
+function researchAddon(id){const w=addonWhy(id);if(w)return w;const a=ADDONS[id];B2.ore-=a.cost.ore;for(const r in a.cost.relics)B2.relics[r]-=a.cost.relics[r];const d=Math.round(a.sec*(SPEC("ren")==="Engineer"?.85:1));B2.q.push({k:"addon:"+id,end:Date.now()+d*1000,dur:d});saveB2();bumpBounty("up");notifyAt(notifId("addon:"+id),ADDONS[id].nm+" researched","Fit it to a gun pad at the Home Base",Date.now()+d*1000);return null;}
 function fitAddon(k,id){const o=B2.tr[k];if(!TRACKS[k].tower)return "Not a turret";if(o.fit.includes(id)){o.fit=o.fit.filter(x=>x!==id);saveB2();return null;}if(!B2.addons[id])return "Research it at the Research Centre first";if(o.fit.length>=addonSlots())return `Only ${addonSlots()} add-on slot${addonSlots()>1?"s":""} (2 at Research Centre Lv25)`;o.fit.push(id);saveB2();return null;}
 const hurryCost=e=>Math.max(1,Math.ceil((e.end-Date.now())/1000/600));
-function hurry(k){const e=B2.q.find(x=>x.k===k);if(!e)return "Nothing to hurry";const c=hurryCost(e);if(B2.cry<c)return `Need ${c} crystal`;B2.cry-=c;e.end=Date.now();finishQ();return null;}
+function hurry(k){const e=B2.q.find(x=>x.k===k);if(!e)return "Nothing to hurry";const c=hurryCost(e);if(B2.cry<c)return `Need ${c} crystal`;B2.cry-=c;e.end=Date.now();cancelNotify(notifId(k));finishQ();return null;}
 function finishQ(){const now=Date.now();const done=[];for(const e of [...B2.q]){if(e.end<=now){if(e.k.startsWith("addon:")){B2.addons[e.k.slice(6)]=true;}else{const o=B2.tr[e.k];o.lv=Math.min(50,o.lv+1);if(e.stat&&o[e.stat]!==undefined)o[e.stat]++;}B2.q=B2.q.filter(x=>x!==e);done.push(e.k);}}if(done.length)saveB2();return done;}
 function setSpec(k,name){const t=TRACKS[k];if(!t.spec)return "No specialisation";if(LV(k)<10)return "Specialise at Lv10";if(SPEC(k))return "Already specialised";if(!t.spec.some(s=>s[0]===name))return "Unknown specialisation";B2.tr[k].spec=name;saveB2();return null;}
 finishQ(); // anything that finished while the app was closed
@@ -343,7 +346,7 @@ let SAVE={};try{SAVE=JSON.parse(localStorage.getItem("holdfast.save")||"{}");}ca
 let startCh=1;try{startCh=+(localStorage.getItem("holdfast.start")||1);localStorage.removeItem("holdfast.start");}catch(e){}
 if(startCh===2&&!SAVE.ch2)startCh=1;
 const CH=CHAPTERS[startCh-1];const CW=()=>CH.waves;
-const S = {ch:CH.n,baseMode:BASEMODE,ore:CH.ore,gas:CH.gas,cry:startCh===2?Math.min(30,(SAVE.cry||0)):0,pop:CH.pop,house:CH.house+MOD.house,food:CH.food+MOD.food,wave:0,phase:"build",t:0,started:false,over:false,injured:[],rep:0,neighbour:null,dovDone:false,
+const S = {ch:CH.n,baseMode:BASEMODE,rested:(Date.now()-(B2.last||0))>8*3.6e6,hurtThisWave:false,ore:CH.ore,gas:CH.gas,cry:startCh===2?Math.min(30,(SAVE.cry||0)):0,pop:CH.pop,house:CH.house+MOD.house,food:CH.food+MOD.food,wave:0,phase:"build",t:0,started:false,over:false,injured:[],rep:0,neighbour:null,dovDone:false,
   buildings:[],enemies:[],shots:[],loot:[],pods:[],hero:null,sel:null,combo:0,comboT:0,rallyT:0,rallyCd:0,
   staff:1,fed:1,out:1,kills:0,rescued:0,lost:0,heroXP:0,heroLv:startCh===2?Math.max(1,(SAVE.heroLv||1)):1,spawnQ:[],waveDone:false,speed:1};
 function saveGame(extra){try{const cur=JSON.parse(localStorage.getItem("holdfast.save")||"{}");localStorage.setItem("holdfast.save",JSON.stringify(Object.assign(cur,extra)));}catch(e){}if(window.__CLOUD)window.__CLOUD.push();}
@@ -597,7 +600,7 @@ function recalc(){
   const morale=1-HUNGER*MOD.hunger*(1-S.fed);
   S.out=(UPTIME_FLOOR+(1-UPTIME_FLOOR)*S.staff)*morale*(S.rallyT>0?1.3:1);
 }
-function income(){let ore=0,gas=0;const fac=(hasFactory()?1.2:1)*MOD.yield;for(const b of S.buildings){const boost=(S.hero.post===b)?1.5:1;if(b.oreW)ore+=b.oreW*S.out*boost*fac;if(b.gasW)gas+=b.gasW*S.out*boost*fac;}
+function income(){let ore=0,gas=0;const fac=(hasFactory()?1.2:1)*MOD.yield*(S.rested&&S.wave<3?1.25:1);for(const b of S.buildings){const boost=(S.hero.post===b)?1.5:1;if(b.oreW)ore+=b.oreW*S.out*boost*fac;if(b.gasW)gas+=b.gasW*S.out*boost*fac;}
   ore=Math.round(ore);gas=Math.round(gas);if(ore){S.ore+=ore;popText(new THREE.Vector3(-2,1,-2),"+"+ore+" ore (mines)");}if(gas){S.gas+=gas;popText(new THREE.Vector3(2,1,-2),"+"+gas+" gas (rigs)","g");}
 }
 // ---------- building ----------
@@ -638,7 +641,7 @@ function place(key,cell,perm){const it=ITEMS[key];if(!perm){S.ore-=it.ore;S.gas-
   const hpm=100*MOD.hp*(perm?1+.02*perm.lv:1);const km=MOD.kind[it.kind]||{};
   const b={key,it,cell,mesh,hp:Math.round(hpm),maxhp:Math.round(hpm),cd:0,xp:0,lv:1,tier:1,pips:[],dps:it.dps||0,rng:((it.rng||0)+(km.rng||0))*(km.rngMul||1),oreW:it.oreW||0,gasW:it.gasW||0,house:it.house||0,food:it.food||0,workers:it.workers||0};
   if(perm){b.perm=true;b.track=perm.k;b.idx=perm.idx||0;b.plv=perm.lv;Object.assign(b,permStats(perm.k,perm.lv,perm.spec));b.workers=Math.ceil((it.workers||0)/2);levelRings(mesh,perm.lv);}
-  cell.b=b;S.buildings.push(b);addBar(b);if(b.house)S.house+=b.house;if(b.food)S.food+=b.food;recalc();if(!perm){tip(it.nm+" built");sfx.build();if(it.factory){popText(mesh.position,"FACTORY ONLINE — Tier 3 unlocked","combo");updateCards();}if(it.beacon){summonNeighbour();}}}
+  cell.b=b;S.buildings.push(b);addBar(b);if(!perm&&it.type==="tower")bumpBounty("guns");if(b.house)S.house+=b.house;if(b.food)S.food+=b.food;recalc();if(!perm){tip(it.nm+" built");sfx.build();if(it.factory){popText(mesh.position,"FACTORY ONLINE — Tier 3 unlocked","combo");updateCards();}if(it.beacon){summonNeighbour();}}}
 // ---------- neighbour island (Chapter 2) ----------
 function summonNeighbour(){if(S.neighbour)return;const g=new THREE.Group();const ox=HALF+6,oz=-3;
   for(let x=-1;x<=1;x++)for(let z=-1;z<=1;z++){if(Math.abs(x)+Math.abs(z)>1.5&&Math.random()<.5)continue;const top=new THREE.Mesh(box,(x+z)%2?M.grass:M.grass2);top.position.set(x,0,z);top.add(new THREE.LineSegments(boxEdges,edgeMat));g.add(top);const d=new THREE.Mesh(box,M.dirt);d.position.set(x,-1,z);g.add(d);const st=new THREE.Mesh(box,M.stone);st.position.set(x,-2,z);st.scale.set(.96,1,.96);g.add(st);}
@@ -701,7 +704,7 @@ $("bSkip").addEventListener("click",()=>{sfx.click();if(S.phase==="build")startC
 $("bSpeed").addEventListener("click",()=>{sfx.click();S.speed=S.speed>=3?1:S.speed+1;$("bSpeed").textContent=S.speed+"×";$("bSpeed").classList.toggle("on",S.speed>1);tip(S.speed>1?"Fast forward "+S.speed+"×":"Normal speed");});
 $("bRally").addEventListener("click",()=>{if(S.rallyCd>0)return;S.rallyT=COMBAT;S.rallyCd=120;recalc();tip("RALLY — everyone works +30% this wave");popText(S.hero.mesh.position,"RALLY!","combo");});
 // ---------- home base mode: the island itself, between runs ----------
-function bankRun(won){const m=won?1:.5;const o=Math.max(0,Math.floor(S.ore*m)),g=Math.max(0,Math.floor(S.gas*m)),c=Math.max(0,Math.floor((S.cry+Math.floor(S.kills/8))*m));B2.ore+=o;B2.gas+=g;B2.cry+=c;B2.runs++;S.banked={o,g,c};saveB2();}
+function bankRun(won){bumpBounty("run");if(won)bumpBounty("wins");const m=won?1:.5;const o=Math.max(0,Math.floor(S.ore*m)),g=Math.max(0,Math.floor(S.gas*m)),c=Math.max(0,Math.floor((S.cry+Math.floor(S.kills/8))*m));B2.ore+=o;B2.gas+=g;B2.cry+=c;B2.runs++;S.banked={o,g,c};saveB2();}
 function goBase(){try{localStorage.setItem("holdfast.mode","base");}catch(e){}location.reload();}
 function goPlay(){try{localStorage.removeItem("holdfast.mode");localStorage.removeItem("holdfast.start");}catch(e){}location.reload();}
 window.__openBase=goBase;window.__B2=B2;
@@ -740,8 +743,8 @@ function addonHtml(k){const t=TRACKS[k];
     return `<div class="ad"><div class="lab">ADD-ONS · ${o.fit.length}/${addonSlots()} fitted</div>${have.map(id=>`<button class="chip ${o.fit.includes(id)?"on":""}" data-fit="${id}">${ADDONS[id].ic} ${ADDONS[id].nm}<small>${ADDONS[id].fx}</small></button>`).join("")}</div>`;}
   if(k==="lab"){return `<div class="ad"><div class="lab">ADD-ON RESEARCH — relics from rocks and ships</div>${ADDON_KEYS.map(id=>{const a=ADDONS[id];const q=B2.q.find(e=>e.k==="addon:"+id);const w=addonWhy(id);const done=!!B2.addons[id];return `<div class="ar ${done?"done":""}"><div><b>${a.ic} ${a.nm}</b><small>${a.fx}</small><small class="c">${done?"Researched — fit it on a gun pad":q?"Researching · "+fmtT((q.end-Date.now())/1000)+" left":fmtCost(a.cost)+" · "+fmtT(a.sec)+" · Lab Lv"+a.lab}</small></div>${done?"":q?`<button class="btn" data-hurryq="addon:${id}">HURRY ${hurryCost(q)} ◆</button>`:`<button class="btn alt" data-res="${id}" ${w?"disabled":""}>RESEARCH</button>`}</div>`;}).join("")}</div>`;}
   return "";}
-function renderBaseHud(){$("bOre").textContent=fmt(B2.ore);$("bGas").textContent=fmt(B2.gas);$("bCry").textContent=B2.cry;$("bRel").innerHTML=Object.keys(RELIC).map(r=>`<span style="color:${RELIC[r].col}">${RELIC[r].ic}${B2.relics[r]}</span>`).join("");$("bHall").textContent="Town Hall Lv "+LV("hall")+" · "+B2.runs+" run"+(B2.runs===1?"":"s");
-  $("bq").innerHTML=B2.q.length?B2.q.map(e=>{const left=Math.max(0,(e.end-Date.now())/1000);const pct=Math.max(2,100*(1-left/e.dur));const nm=e.k.startsWith("addon:")?"Research: "+ADDONS[e.k.slice(6)].nm:TRACKS[e.k].nm+" → Lv"+(LV(e.k)+1)+(e.stat?" ("+{pow:"power",rng:"range",spd:"speed"}[e.stat]+")":"");return `<div class="qr" data-k="${e.k}"><span>${nm}</span><div class="tr"><div class="f" style="width:${pct}%"></div></div><b>${fmtT(left)}</b></div>`;}).join(""):`<div class="qr idle">Crews idle — tap a building, a turret pad or Ren to upgrade</div>`;
+function renderBaseHud(){$("bOre").textContent=fmt(B2.ore);$("bGas").textContent=fmt(B2.gas);$("bCry").textContent=B2.cry;$("bRel").innerHTML=Object.keys(RELIC).map(r=>`<span style="color:${RELIC[r].col}">${RELIC[r].ic}${B2.relics[r]}</span>`).join("");$("bHall").textContent="Town Hall Lv "+LV("hall")+" · "+B2.runs+" run"+(B2.runs===1?"":"s");$("bToday").classList.toggle("hot",dailyReady());
+  $("bq").innerHTML=B2.q.length?B2.q.map(e=>{const left=Math.max(0,(e.end-Date.now())/1000);const pct=Math.max(2,100*(1-left/e.dur));const nm=e.k.startsWith("addon:")?"Research: "+ADDONS[e.k.slice(6)].nm:TRACKS[e.k].nm+" → Lv"+(LV(e.k)+1)+(e.stat?" ("+{pow:"power",rng:"range",spd:"speed"}[e.stat]+")":"");return `<div class="qr" data-k="${e.k}"><span>${nm}</span><div class="tr"><div class="f" style="width:${pct}%"></div></div><b>${fmtT(left)}</b></div>`;}).join(""):`<div class="qr idle">${nextGoal()} · island ${islandPct()}% rebuilt</div>`;
   $("bq").querySelectorAll(".qr[data-k]").forEach(r=>r.onclick=()=>{sfx.click();bSel=r.dataset.k.startsWith("addon:")?"lab":r.dataset.k;renderCard();});}
 let lastBaseTick=0;
 function baseTick(){const done=finishQ();if(done.length)applyDone(done);renderBaseHud();
@@ -762,7 +765,7 @@ function initBase(){$("screen").classList.add("hide");$("hud").style.display="no
   const hrs=Math.min(8,Math.max(0,(Date.now()-(B2.last||Date.now()))/3.6e6));
   if(hrs>=.05){let o=0,g=0;for(const b of S.buildings){if(b.perm){o+=(b.oreW||0)*2*hrs;g+=(b.gasW||0)*2*hrs;}}o=Math.round(o);g=Math.round(g);if(o||g){B2.ore+=o;B2.gas+=g;saveB2();setTimeout(()=>tip(`While you were away (${hrs.toFixed(1)}h): +${o} ore, +${g} gas`),700);}}
   S.hero.tx=S.hero.x;S.hero.tz=S.hero.z;S.camVel=.004;AUDIO.music("intro");renderBaseHud();if(!B2.seenBase){B2.seenBase=true;saveB2();setTimeout(()=>tip("Tap a building, gun pad or Ren to upgrade — green arrow = ready"),1500);}
-  $("bPlay").addEventListener("click",()=>{sfx.click();goPlay();});$("bRen").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel="ren";renderCard();});
+  $("bPlay").addEventListener("click",()=>{sfx.click();goPlay();});$("bRen").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel="ren";renderCard();});$("bToday").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel=null;renderDaily();});ensureDaily();if(dailyReady())setTimeout(()=>tip("Supply drop and bounties waiting — tap TODAY"),2600);
   $("bSnd").addEventListener("click",()=>{sfx.unlock();const m=AUDIO.cycle();$("bSnd").textContent=m===2?"SOUND":m===1?"SFX ONLY":"MUTED";});
   window.__base={research:researchAddon,fit:fitAddon,addons:ADDONS,move:(k,i,x,z)=>moveTrack(k,i,cellAt(x,z)),sel:k=>{bSel=k;renderCard();},up:startUp,hurry:k=>{const r=hurry(k);if(!r)applyDone([k]);renderBaseHud();return r;},spec:setSpec,why,cost:upCost,time:upTime,hud:renderBaseHud,tick:baseTick};}
 // ---------- accounts + cloud save (Firebase Auth + Firestore; optional — the game runs fully offline without it) ----------
@@ -833,8 +836,61 @@ CLOUD.onChange(()=>{renderAccount();const d=$("bCloud");if(d)d.className="cl "+C
 for(const id of ["bAcct","bCloud"]){const e=$(id);if(e)e.addEventListener("click",openAccount);}
 window.__openAccount=openAccount;
 if(CLOUD.configured){CLOUD.load().catch(()=>{});}
+// ---------- retention loops: daily supply drop + streak, daily/weekly bounties, rested crews, pity timers, next-goal hints ----------
+const dayKey=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+const weekKey=()=>{const d=new Date();const s=new Date(d.getFullYear(),0,1);return d.getFullYear()+"-W"+Math.floor(((d-s)/864e5+s.getDay())/7);};
+const BOUNTIES=[
+  {id:"kills",txt:"Break 40 rocks or ships",goal:40,rw:{ore:200}},
+  {id:"run",txt:"Finish a run (win or lose)",goal:1,rw:{cry:5}},
+  {id:"guns",txt:"Build 6 guns",goal:6,rw:{gas:80}},
+  {id:"pods",txt:"Rescue 2 escape pods",goal:2,rw:{cry:4}},
+  {id:"up",txt:"Start 2 base upgrades",goal:2,rw:{ore:150}},
+  {id:"boss",txt:"Bring down a boss",goal:1,rw:{relic:"seam"}},
+  {id:"waves",txt:"Clear 12 waves",goal:12,rw:{ore:250}},
+  {id:"perfect",txt:"Clear 3 waves without a scratch",goal:3,rw:{gas:60}},
+];
+const WEEKLY={id:"wins",txt:"Win 3 runs this week",goal:3,rw:{relic:"lens",cry:10}};
+const DAILY_RW=[{ore:100},{gas:40},{cry:3},{ore:200},{gas:80},{cry:6},{relic:"seam"}];
+function rwText(rw){return Object.entries(rw).map(([k,v])=>k==="relic"?RELIC[v].ic+" "+RELIC[v].nm:v+" "+(k==="cry"?"◆":k)).join(" · ");}
+function giveRw(rw){for(const k in rw){if(k==="relic")B2.relics[rw[k]]++;else B2[k]+=rw[k];}}
+function ensureDaily(){const dk=dayKey(),wk=weekKey();if(!B2.daily||B2.daily.day!==dk){const prev=B2.daily;const yesterday=new Date(Date.now()-864e5);const yk=yesterday.getFullYear()+"-"+String(yesterday.getMonth()+1).padStart(2,"0")+"-"+String(yesterday.getDate()).padStart(2,"0");
+    const streak=prev&&prev.claimed&&prev.day===yk?(prev.streak||0):0;const r=seeded(parseInt(dk.replace(/-/g,""),10));const pool=[...BOUNTIES];const picks=[];while(picks.length<3&&pool.length){picks.push(pool.splice(Math.floor(r()*pool.length),1)[0]);}
+    B2.daily={day:dk,streak,claimed:false,b:picks.map(p=>({id:p.id,n:0,claimed:false}))};saveB2();}
+  if(!B2.weekly||B2.weekly.week!==wk){B2.weekly={week:wk,n:0,claimed:false};saveB2();}}
+function bumpBounty(id,n=1){if(!B2.daily)ensureDaily();let hit=false;for(const b of B2.daily.b){if(b.id===id&&!b.claimed){const g=BOUNTIES.find(x=>x.id===b.id).goal;const was=b.n;b.n=Math.min(g,b.n+n);if(was<g&&b.n>=g)hit=true;}}
+  if(id==="wins"&&B2.weekly&&!B2.weekly.claimed){const was=B2.weekly.n;B2.weekly.n=Math.min(WEEKLY.goal,B2.weekly.n+n);if(was<WEEKLY.goal&&B2.weekly.n>=WEEKLY.goal)hit=true;}
+  if(hit){saveB2();if(typeof popText==="function"&&S.hero)popText(S.hero.mesh.position,"BOUNTY COMPLETE — claim it at the base","combo");if(typeof sfx!=="undefined")sfx.level();}}
+function claimDaily(){ensureDaily();if(B2.daily.claimed)return "Already claimed today";B2.daily.claimed=true;B2.daily.streak=(B2.daily.streak||0)+1;const rw=DAILY_RW[(B2.daily.streak-1)%7];giveRw(rw);saveB2();return null;}
+function claimBounty(id){ensureDaily();if(id==="wins"){if(B2.weekly.claimed||B2.weekly.n<WEEKLY.goal)return "Not done yet";B2.weekly.claimed=true;giveRw(WEEKLY.rw);saveB2();return null;}
+  const b=B2.daily.b.find(x=>x.id===id);const def=BOUNTIES.find(x=>x.id===id);if(!b||!def)return "Unknown";if(b.claimed)return "Already claimed";if(b.n<def.goal)return "Not done yet";b.claimed=true;giveRw(def.rw);saveB2();return null;}
+function dailyReady(){ensureDaily();return !B2.daily.claimed||B2.daily.b.some(b=>!b.claimed&&b.n>=BOUNTIES.find(x=>x.id===b.id).goal)||(B2.weekly&&!B2.weekly.claimed&&B2.weekly.n>=WEEKLY.goal);}
+function nextGoal(){ // the one thing the player is closest to unlocking — shown on the base HUD
+  const H=LV("hall");if(LV("railgun")===0)return H<10?`Railgun pattern unlocks at Town Hall Lv10 — ${10-H} to go`:"Railgun pattern ready to build on its gun pad";
+  if(LV("beam")===0)return H<20?`Crystal Beam unlocks at Town Hall Lv20 — ${20-H} to go`:"Crystal Beam ready to build on its gun pad";
+  const noSpec=TRACK_KEYS.find(k=>TRACKS[k].spec&&LV(k)>=10&&!SPEC(k));if(noSpec)return `${TRACKS[noSpec].nm} can specialise now`;
+  const nearSpec=TRACK_KEYS.filter(k=>TRACKS[k].spec&&LV(k)<10).sort((a,b)=>LV(b)-LV(a))[0];if(nearSpec)return `${TRACKS[nearSpec].nm} specialises at Lv10 — ${10-LV(nearSpec)} to go`;
+  const add=ADDON_KEYS.find(id=>!B2.addons[id]);if(add)return `Next add-on: ${ADDONS[add].nm} (${rwText(ADDONS[add].cost.relics)})`;
+  const g=gate("hall");return g||`Town Hall Lv${H+1} is open`;}
+function islandPct(){const lv=TRACK_KEYS.reduce((s,k)=>s+LV(k),0);const specs=TRACK_KEYS.filter(k=>SPEC(k)).length;const adds=ADDON_KEYS.filter(id=>B2.addons[id]).length;return Math.min(100,Math.round(100*(lv/(50*TRACK_KEYS.length)*.7+specs/TRACK_KEYS.length*.15+adds/ADDON_KEYS.length*.15)));}
+function renderDaily(){ensureDaily();const el=$("bcard");const d=B2.daily,w=B2.weekly;const rw=DAILY_RW[(d.streak+(d.claimed?-1:0))%7];
+  const rows=d.b.map(b=>{const def=BOUNTIES.find(x=>x.id===b.id);const pct=Math.min(100,100*b.n/def.goal);const done=b.n>=def.goal;return `<div class="ar ${b.claimed?"done":""}"><div><b>${def.txt}</b><small>${rwText(def.rw)}</small><div class="tr"><div class="f" style="width:${pct}%"></div></div><small class="c">${b.claimed?"Claimed":b.n+" / "+def.goal}</small></div>${b.claimed?"":`<button class="btn ${done?"":"snd"}" data-claim="${b.id}" ${done?"":"disabled"}>${done?"CLAIM":"…"}</button>`}</div>`;}).join("");
+  const wp=Math.min(100,100*w.n/WEEKLY.goal);const wdone=w.n>=WEEKLY.goal;
+  el.innerHTML=`<div class="hd"><b>TODAY</b><span>DAY ${d.streak+(d.claimed?0:1)} STREAK · ISLAND ${islandPct()}% REBUILT</span><button class="x" data-x="1">✕</button></div>
+    <div class="ar ${d.claimed?"done":""}"><div><b>Supply drop</b><small>${d.claimed?"Come back tomorrow for "+rwText(DAILY_RW[d.streak%7]):"Today: "+rwText(rw)+" · day 7 of a streak brings a relic"}</small></div>${d.claimed?"":`<button class="btn" data-daily="1">CLAIM</button>`}</div>
+    <div class="ad"><div class="lab">DAILY BOUNTIES — reset at midnight</div>${rows}</div>
+    <div class="ad"><div class="lab">THIS WEEK</div><div class="ar ${w.claimed?"done":""}"><div><b>${WEEKLY.txt}</b><small>${rwText(WEEKLY.rw)}</small><div class="tr"><div class="f" style="width:${wp}%"></div></div><small class="c">${w.claimed?"Claimed":w.n+" / "+WEEKLY.goal}</small></div>${w.claimed?"":`<button class="btn ${wdone?"":"snd"}" data-claim="wins" ${wdone?"":"disabled"}>${wdone?"CLAIM":"…"}</button>`}</div></div>
+    <div class="lore">${nextGoal()}</div>`;
+  el.classList.add("show");el.querySelector("[data-x]").onclick=()=>{sfx.click();el.classList.remove("show");};
+  const dd=el.querySelector("[data-daily]");if(dd)dd.onclick=()=>{const r=claimDaily();if(r){tip(r);sfx.deny();}else{sfx.crystal();tip("Supply drop claimed — day "+B2.daily.streak);}renderDaily();renderBaseHud();};
+  el.querySelectorAll("[data-claim]").forEach(b=>b.onclick=()=>{const r=claimBounty(b.dataset.claim);if(r){tip(r);sfx.deny();}else{sfx.crystal();tip("Bounty claimed");}renderDaily();renderBaseHud();});}
+// local notifications for finished upgrades (native app only; silently skipped on the web)
+function notifyAt(id,title,body,when){try{const P=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications;if(!P)return;P.requestPermissions().then(()=>P.schedule({notifications:[{id,title,body,schedule:{at:new Date(when)}}]})).catch(()=>{});}catch(e){}}
+function cancelNotify(id){try{const P=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications;if(P)P.cancel({notifications:[{id}]}).catch(()=>{});}catch(e){}}
+const notifId=k=>{let h=7;for(const c of k)h=(h*31+c.charCodeAt(0))&0x7fffffff;return h%100000+1;};
+if(!S.baseMode){try{ensureDaily();if(dailyReady()){$("bBase").classList.add("hot");$("bBase").textContent="HOME BASE ●";}}catch(e){}}
+window.__daily={ensure:ensureDaily,bump:bumpBounty,claim:claimDaily,claimB:claimBounty,ready:dailyReady,next:nextGoal,pct:islandPct,render:renderDaily};
 for(const i of [0,1]){$("bNext"+i).addEventListener("click",()=>{sfx.unlock();AUDIO.music("intro");sfx.build();document.querySelectorAll("#screen .slide").forEach(sl=>sl.classList.toggle("on",+sl.dataset.i===i+1));S.camAngle+=.9;});}
-$("bStart").addEventListener("click",()=>{sfx.unlock();$("screen").classList.add("hide");S.started=true;S.camVel=.02;startBuild();sfx.build();if(B2.runs>0)setTimeout(()=>{if(!S.over)tip("The tide took last run's guns — the foundations and Tam's patterns held");},1200);});
+$("bStart").addEventListener("click",()=>{sfx.unlock();$("screen").classList.add("hide");S.started=true;S.camVel=.02;startBuild();sfx.build();if(S.rested)setTimeout(()=>banner("RESTED CREWS","+25% mine and rig income for 3 waves"),600);if(B2.runs>0)setTimeout(()=>{if(!S.over)tip("The tide took last run's guns — the foundations and Tam's patterns held");},1200);});
 if(SAVE.ch2&&S.ch===1){$("bCh2").style.display="";$("bCh2").addEventListener("click",()=>{try{localStorage.setItem("holdfast.start","2");}catch(e){}location.reload();});}
 if(S.ch===2){document.querySelector('.slide[data-i="0"] h1').textContent="Chapter 2";document.querySelector('.slide[data-i="0"] p').textContent="The mothership is gone. The radio isn't dead after all. Somewhere out in the debris, a town called Marrow Hill is asking if you're real.";
   document.querySelector('.slide[data-i="1"] h1').textContent="Neighbours";document.querySelector('.slide[data-i="1"] p').textContent="A new rock, a bigger town: Tam, Asha, Dov, Bo and Pip came with you. New ships too — reapers that go for people, not guns. And under the veins, something Dov wants to dig up.";
@@ -854,7 +910,7 @@ function startCombat(){S.phase="combat";S.t=COMBAT;S.waveDone=false;AUDIO.music(
   if(S.wave===0){banner(S.ch===1?"WAVE 1":"CHAPTER 2",S.ch===1?"Get a gun up.":"Neighbours");}
   const w=CW()[S.wave];S.spawnQ=[];const push=(k,n)=>{for(let i=0;i<(n||0);i++)S.spawnQ.push({k,at:COMBAT-(1.5+Math.random()*(COMBAT-10))});};
   push("small",w.s);push("medium",w.m);push("large",w.l);push("fighter",w.f);push("reaper",w.r);push("crystal",w.c);if(w.b===1)S.spawnQ.push({k:"boss",at:COMBAT-3});if(w.b===2)S.spawnQ.push({k:"harvester",at:COMBAT-3});S.spawnQ.sort((a,b)=>b.at-a.at);}
-function endWave(){income();sfx.waveClear();
+function endWave(){income();sfx.waveClear();bumpBounty("waves");if(!S.hurtThisWave&&S.wave>0){S.cry+=1;popText(S.hall.mesh.position,"PERFECT WAVE +1 ◆","c");bumpBounty("perfect");}S.hurtThisWave=false;
   // pods not reached drift on
   for(const p of S.pods){if(!p.got){world.remove(p.mesh);S.lost+=p.n;popText(p.mesh.position,"pod drifted on","bad");}}S.pods=[];
   S.injured=S.injured.map(x=>x-MOD.heal).filter(x=>x>0);recalc();neighbourWave();dovCheck();
@@ -882,7 +938,7 @@ function spawn(k){const e=ENEMY[k];let cell=targetCell();if(e.reaper){const staf
 function spawnPod(n){const g=new THREE.Group();const c=new THREE.Mesh(new THREE.BoxGeometry(.6,.7,.6),mat(0xD9D3C4));c.position.y=.85;g.add(c);const l=new THREE.Mesh(new THREE.BoxGeometry(.7,.1,.7),new THREE.MeshBasicMaterial({color:0xFFD34D}));l.position.y=1.25;g.add(l);
   const edge=cells.filter(c=>c.buildable&&!c.b&&(c.x===B0||c.z===B0||c.x===B1||c.z===B1));const cell=edge[Math.floor(Math.random()*edge.length)];g.position.set(cell.x-HALF,8,cell.z-HALF);g.traverse(o=>{if(o.isMesh)o.castShadow=true;});world.add(g);
   S.pods.push({mesh:g,n,cell,got:false,landing:true});tip(`Escape pod incoming — ${n} survivors. Send Ren.`);sfx.pod();}
-window.__damageAt=(c,a,p)=>damageAt(c,a,p);function damageAt(cell,amt,pos){sfx.hit();
+window.__damageAt=(c,a,p)=>damageAt(c,a,p);function damageAt(cell,amt,pos){sfx.hit();if(cell.b)S.hurtThisWave=true;
   if(cell.b){const b=cell.b;b.hp-=amt;updateBar(b);if(b.key==="hall"){popText(pos,"TOWN HALL −"+amt,"bad");if(b.hp<=0){lose();return;}}
     else{popText(pos,b.it.nm+" −"+amt,"bad");if(b.it.workers&&S.pop>0&&Math.random()<.5){popText(pos.clone().add(new THREE.Vector3(.5,0,0)),"worker injured","bad");}
       if(b.hp<=0){popText(pos,b.it.nm+" destroyed","bad");destroyBuilding(b);}else{b.mesh.rotation.z=(b.hp/b.maxhp-1)*.25;}}
@@ -892,9 +948,10 @@ window.__damageAt=(c,a,p)=>damageAt(c,a,p);function damageAt(cell,amt,pos){sfx.h
 function flyLoot(localPos,kind,n){const v=localPos.clone();v.applyMatrix4(world.matrixWorld);v.project(cam);const sx=(v.x+1)/2*innerWidth,sy=(1-v.y)/2*innerHeight;const pill=document.querySelector(".pill."+kind);const r=pill.getBoundingClientRect();
   for(let i=0;i<n;i++){const d=document.createElement("div");d.className="dot";d.style.background=kind==="ore"?"#FFD34D":kind==="gas"?"#58D68D":"#B36BFF";d.style.left=(sx+(Math.random()-.5)*30)+"px";d.style.top=(sy+(Math.random()-.5)*30)+"px";document.body.appendChild(d);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{d.style.transform=`translate(${r.left+r.width/2-sx}px,${r.top+r.height/2-sy}px) scale(.5)`;d.style.opacity="0.2";}));setTimeout(()=>{d.remove();pill.classList.remove("bump");void pill.offsetWidth;pill.classList.add("bump");},560+i*40);}}
-function kill(en){S.kills++;const p=en.mesh.position.clone();sfx.kill(en.k);
+function kill(en){S.kills++;bumpBounty("kills");if(en.boss)bumpBounty("boss");const p=en.mesh.position.clone();sfx.kill(en.k);
   let ore=en.e.ore,gas=en.e.gas;let cry=(en.e.cryN&&Math.random()<en.e.cryP+MOD.cryP)?Math.ceil(en.e.cryN*MOD.cryMult):0;
-  const relic=en.boss?(en.harvester?"drill":"core"):en.k==="crystal"&&Math.random()<.25?"seam":en.k==="large"&&Math.random()<.06?"seam":((en.k==="fighter"&&Math.random()<.05)||(en.k==="reaper"&&Math.random()<.04))?"lens":null;
+  B2.pity=B2.pity||{seam:0,lens:0};let relic=en.boss?(en.harvester?"drill":"core"):en.k==="crystal"&&Math.random()<.25?"seam":en.k==="large"&&Math.random()<.06?"seam":((en.k==="fighter"&&Math.random()<.05)||(en.k==="reaper"&&Math.random()<.04))?"lens":null;
+  if(!relic&&en.k==="crystal"&&++B2.pity.seam>=5)relic="seam";if(!relic&&(en.k==="fighter"||en.k==="reaper")&&++B2.pity.lens>=25)relic="lens";if(relic==="seam")B2.pity.seam=0;if(relic==="lens")B2.pity.lens=0;
   if(relic){B2.relics[relic]++;saveB2();popText(p.clone().add(new THREE.Vector3(0,1.3,0)),RELIC[relic].ic+" "+RELIC[relic].nm+" recovered","combo");sfx.crystal();}
   S.comboT>0?S.combo++:S.combo=1;S.comboT=1.0;const mult=Math.min(3,S.combo);if(mult>1)ore=Math.round(ore*(1+.25*(mult-1)));
   if(ore){S.ore+=ore;popText(p,"+"+ore+" ore");flyLoot(p,"ore",3);sfx.loot();}if(gas){S.gas+=gas;popText(p.clone().add(new THREE.Vector3(0,.4,0)),"+"+gas+" gas","g");flyLoot(p,"gas",2);}
@@ -922,7 +979,7 @@ function tide(){S.tide=0;const guns=S.buildings.filter(b=>b.it.type==="tower");i
 function win(){S.over=true;AUDIO.music("win");sfx.win();bankRun(true);tide();saveGame(S.ch===1?{ch2:true,heroLv:S.heroLv,cry:S.cry,ch1Stars:Math.min(3,(S.lost===0?1:0)+(S.hall.hp>=S.hall.maxhp*.5?1:0)+1)}:{ch3:true,heroLv:S.heroLv,cry:S.cry});
   setTimeout(()=>screen(S.ch===1?"CHAPTER 1 — HOLDFAST":"CHAPTER 2 — NEIGHBOURS",S.ch===1?`They pulled back. ${S.pop} of you now, on a rock that used to be a town. HOLD has been hearing voices on the old radio — other islands, other survivors.`:`The machine is scrap on the seam. Marrow Hill is cheering across the bridge. And Dov was right: the crystal was under us all along. Whatever ended the world came for it — and it's still out there, still pulling pieces of home up into the dark.`,"island"),2600);}
 function lose(){S.over=true;AUDIO.music("lose");sfx.lose();bankRun(false);tide();setTimeout(()=>screen("THE HALL IS GONE",`Wave ${S.wave+1}. ${S.pop} people and nowhere to stand. Mine first, house the pods before they land, and keep Ren near whatever's taking hits.`,""),2200);}
-function screen(h,t,art){const sc=$("screen");sc.classList.remove("hide");const stars=Math.min(3,(S.lost===0?1:0)+(S.hall.hp>=S.hall.maxhp*.5?1:0)+1);sc.innerHTML=`<div class="box"><div class="art ${art||""}"></div><h1>${h}</h1><p>${t}</p><div class="k"><span>Rocks and ships</span><b>${S.kills}</b><span>Survivors rescued</span><b>${S.rescued}</b><span>Lost or drifted</span><b>${S.lost}</b><span>Ren</span><b>Lv ${S.heroLv}</b><span>Ore banked</span><b>${fmt(S.ore)}</b><span>Crystal</span><b>${S.cry}</b><span>Buildings standing</span><b>${S.buildings.length}</b><span>Hall</span><b>${Math.max(0,Math.round(S.hall.hp/S.hall.maxhp*100))}%</b><span>Banked</span><b>+${(S.banked||{}).o||0} ore · +${(S.banked||{}).g||0} gas · +${(S.banked||{}).c||0} ◆</b></div>${S.over&&h.startsWith("CHAPTER")?`<p class="tap">${"★".repeat(stars)}${"☆".repeat(3-stars)} — no one lost, hall above half, mothership down</p>`:""}<p class="tap">THE TIDE TOOK THE GUNS · FOUNDATIONS HELD · PATTERNS KEPT</p>${S.over&&h.startsWith("CHAPTER 1")?`<button class="btn" onclick="try{localStorage.setItem('holdfast.start','2')}catch(e){};location.reload()">CONTINUE — CHAPTER 2</button>`:""}${S.over&&h.startsWith("CHAPTER 2")?`<p class="tap">CHAPTER 3: THE ENGINE — COMING NEXT</p>`:""}<button class="btn alt" onclick="window.__openBase()">HOME BASE</button><button class="btn snd" onclick="try{localStorage.removeItem('holdfast.start')}catch(e){};location.reload()">${S.over&&h.startsWith("CHAPTER")?"BACK TO START":"PLAY AGAIN"}</button></div>`;}
+function screen(h,t,art){const sc=$("screen");sc.classList.remove("hide");const stars=Math.min(3,(S.lost===0?1:0)+(S.hall.hp>=S.hall.maxhp*.5?1:0)+1);sc.innerHTML=`<div class="box"><div class="art ${art||""}"></div><h1>${h}</h1><p>${t}</p><div class="k"><span>Rocks and ships</span><b>${S.kills}</b><span>Survivors rescued</span><b>${S.rescued}</b><span>Lost or drifted</span><b>${S.lost}</b><span>Ren</span><b>Lv ${S.heroLv}</b><span>Ore banked</span><b>${fmt(S.ore)}</b><span>Crystal</span><b>${S.cry}</b><span>Buildings standing</span><b>${S.buildings.length}</b><span>Hall</span><b>${Math.max(0,Math.round(S.hall.hp/S.hall.maxhp*100))}%</b><span>Banked</span><b>+${(S.banked||{}).o||0} ore · +${(S.banked||{}).g||0} gas · +${(S.banked||{}).c||0} ◆</b></div>${S.over&&h.startsWith("CHAPTER")?`<p class="tap">${"★".repeat(stars)}${"☆".repeat(3-stars)} — no one lost, hall above half, mothership down</p>`:""}<p class="tap">THE TIDE TOOK THE GUNS · FOUNDATIONS HELD · PATTERNS KEPT</p>${(()=>{try{ensureDaily();const d=B2.daily.b.filter(b=>!b.claimed&&b.n>=BOUNTIES.find(x=>x.id===b.id).goal).length;return d?`<p class="tap" style="color:var(--gold)">${d} BOUNT${d>1?"IES":"Y"} READY TO CLAIM AT THE HOME BASE</p>`:"";}catch(e){return "";}})()}${S.over&&h.startsWith("CHAPTER 1")?`<button class="btn" onclick="try{localStorage.setItem('holdfast.start','2')}catch(e){};location.reload()">CONTINUE — CHAPTER 2</button>`:""}${S.over&&h.startsWith("CHAPTER 2")?`<p class="tap">CHAPTER 3: THE ENGINE — COMING NEXT</p>`:""}<button class="btn alt" onclick="window.__openBase()">HOME BASE</button><button class="btn snd" onclick="try{localStorage.removeItem('holdfast.start')}catch(e){};location.reload()">${S.over&&h.startsWith("CHAPTER")?"BACK TO START":"PLAY AGAIN"}</button></div>`;}
 // ---------- loop ----------
 let last=performance.now();
 function placeCam(){const w=innerWidth,h=innerHeight;const dist=(w<h?36:25)*(S.camZoom||1);const p=S.camPitch||0.95;cam.position.set(0,dist*Math.sin(p),dist*Math.cos(p));const up=Math.max(0,.6-p)*9;cam.lookAt(0,0.3+up,0.4);}
@@ -944,7 +1001,7 @@ function step(now){const raw=Math.min(.05,(now-last)/1000);last=now;requestAnima
     h.mesh.position.set(h.x,groundY(h.x,h.z)+Math.abs(Math.sin(h.bob))*.12,h.z);}
   // pods
   for(const p of S.pods){if(p.landing){p.mesh.position.y-=dt*4;if(p.mesh.position.y<=p.cell.h){p.mesh.position.y=p.cell.h;p.landing=false;}}
-    else if(!p.got&&h.down<=0&&Math.hypot(h.x-p.mesh.position.x,h.z-p.mesh.position.z)<.7){p.got=true;const room=Math.max(0,S.house-S.pop);const take=Math.min(room,p.n);S.pop+=take;S.rescued+=take;S.heroXP+=15*take;if(take<p.n){S.lost+=p.n-take;popText(p.mesh.position,`+${take} — ${p.n-take} had no home and drifted on`,"bad");}else popText(p.mesh.position,"+"+take+" survivors","g");world.remove(p.mesh);recalc();sfx.rescue();}}
+    else if(!p.got&&h.down<=0&&Math.hypot(h.x-p.mesh.position.x,h.z-p.mesh.position.z)<.7){p.got=true;bumpBounty("pods");const room=Math.max(0,S.house-S.pop);const take=Math.min(room,p.n);S.pop+=take;S.rescued+=take;S.heroXP+=15*take;if(take<p.n){S.lost+=p.n-take;popText(p.mesh.position,`+${take} — ${p.n-take} had no home and drifted on`,"bad");}else popText(p.mesh.position,"+"+take+" survivors","g");world.remove(p.mesh);recalc();sfx.rescue();}}
   if(S.started&&!S.over){
     if(S.rallyT>0){S.rallyT-=dt;if(S.rallyT<=0)recalc();}if(S.rallyCd>0)S.rallyCd-=dt;$("bRally").disabled=S.rallyCd>0;$("bRally").textContent=S.rallyCd>0?"RALLY "+Math.ceil(S.rallyCd)+"s":"RALLY";
     if(S.comboT>0)S.comboT-=dt;
