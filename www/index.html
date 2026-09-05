@@ -290,9 +290,9 @@ const TRACKS={
 };
 const TRACK_KEYS=Object.keys(TRACKS);
 const LORE={perm:"Dug into bedrock — the tide can't take it. Stands on the island from wave 1 of every run.",tower:"The tide takes every gun when the sky passes. Old Tam keeps the pattern — each level is a better pattern the crews build from on wave 1.",hero:"Ren fixes things. People are looking at her."};
-function newB2(){const tr={};for(const k of TRACK_KEYS)tr[k]={lv:TRACKS[k].lv0===0?0:1,spec:null};return {v:2,ore:0,gas:0,cry:0,relics:{seam:0,core:0,drill:0,lens:0},runs:0,tr,q:[],last:Date.now()};}
+function newB2(){const tr={};for(const k of TRACK_KEYS)tr[k]={lv:TRACKS[k].lv0===0?0:1,spec:null};return {v:2,ore:0,gas:0,cry:0,relics:{seam:0,core:0,drill:0,lens:0},runs:0,tr,q:[],pos:{},last:Date.now()};}
 let B2=null;
-try{const raw=localStorage.getItem("holdfast.base2");if(raw){const b=JSON.parse(raw);B2=Object.assign(newB2(),b);B2.relics=Object.assign({seam:0,core:0,drill:0,lens:0},b.relics||{});const tr=newB2().tr;for(const k in tr)tr[k]=Object.assign(tr[k],(b.tr||{})[k]||{});B2.tr=tr;B2.q=Array.isArray(b.q)?b.q.filter(e=>TRACKS[e.k]):[];}}catch(e){B2=null;}
+try{const raw=localStorage.getItem("holdfast.base2");if(raw){const b=JSON.parse(raw);B2=Object.assign(newB2(),b);B2.relics=Object.assign({seam:0,core:0,drill:0,lens:0},b.relics||{});const tr=newB2().tr;for(const k in tr)tr[k]=Object.assign(tr[k],(b.tr||{})[k]||{});B2.tr=tr;B2.q=Array.isArray(b.q)?b.q.filter(e=>TRACKS[e.k]):[];B2.pos=(b.pos&&typeof b.pos==='object')?b.pos:{};}}catch(e){B2=null;}
 if(!B2){B2=newB2();try{const o=JSON.parse(localStorage.getItem("holdfast.base")||"null");if(o){const r=o.r||{};const cap=v=>Math.max(1,Math.min(50,v));B2.cry=o.bank||0;B2.runs=o.runs||0;B2.tr.hall.lv=cap(1+((o.hall||1)-1)*3+(r.log||0)*2);B2.tr.factory.lv=cap(1+(r.bal||0)*3);B2.tr.mine.lv=cap(1+(r.mine||0)*3);B2.tr.ren.lv=cap(1+(r.ren||0)*3);B2.tr.shelter.lv=cap(1+(r.hard||0)*3);}}catch(e){}}
 function saveB2(){B2.last=Date.now();try{localStorage.setItem("holdfast.base2",JSON.stringify(B2));}catch(e){}if(window.__CLOUD)window.__CLOUD.push();}
 const LV=k=>B2.tr[k].lv, SPEC=k=>B2.tr[k].spec;
@@ -542,7 +542,7 @@ function updateBar(b){if(!b.bar)return;const f=Math.max(0,b.hp/b.maxhp);b.bar.vi
 function place(key,cell,perm){const it=ITEMS[key];if(!perm){S.ore-=it.ore;S.gas-=it.gas;S.cry-=(it.cry||0);}if(cell.deco){world.remove(cell.deco);cell.deco=null;}const mesh=makeMesh(key);mesh.position.set(cell.x-HALF,cell.h,cell.z-HALF);mesh.traverse(o=>{if(o.isMesh)o.castShadow=true;});world.add(mesh);
   const hpm=100*MOD.hp*(perm?1+.02*perm.lv:1);const km=MOD.kind[it.kind]||{};
   const b={key,it,cell,mesh,hp:Math.round(hpm),maxhp:Math.round(hpm),cd:0,xp:0,lv:1,tier:1,pips:[],dps:it.dps||0,rng:(it.rng||0)+(km.rng||0),oreW:it.oreW||0,gasW:it.gasW||0,house:it.house||0,food:it.food||0,workers:it.workers||0};
-  if(perm){b.perm=true;b.track=perm.k;b.plv=perm.lv;Object.assign(b,permStats(perm.k,perm.lv,perm.spec));b.workers=Math.ceil((it.workers||0)/2);levelRings(mesh,perm.lv);}
+  if(perm){b.perm=true;b.track=perm.k;b.idx=perm.idx||0;b.plv=perm.lv;Object.assign(b,permStats(perm.k,perm.lv,perm.spec));b.workers=Math.ceil((it.workers||0)/2);levelRings(mesh,perm.lv);}
   cell.b=b;S.buildings.push(b);addBar(b);if(b.house)S.house+=b.house;if(b.food)S.food+=b.food;recalc();if(!perm){tip(it.nm+" built");sfx.build();if(it.factory){popText(mesh.position,"FACTORY ONLINE — Tier 3 unlocked","combo");updateCards();}if(it.beacon){summonNeighbour();}}}
 // ---------- neighbour island (Chapter 2) ----------
 function summonNeighbour(){if(S.neighbour)return;const g=new THREE.Group();const ox=11,oz=-3;
@@ -611,11 +611,14 @@ window.__openBase=goBase;window.__B2=B2;
 $("bBase").addEventListener("click",()=>{sfx.click();goBase();});
 const fmtT=s=>s<60?Math.max(0,Math.ceil(s))+"s":s<3600?Math.floor(s/60)+"m "+Math.floor(s%60)+"s":Math.floor(s/3600)+"h "+Math.floor(s%3600/60)+"m";
 const fmtCost=c=>{const p=[];if(c.ore)p.push(`<i class="o">${c.ore} ore</i>`);if(c.gas)p.push(`<i class="g">${c.gas} gas</i>`);if(c.cry)p.push(`<i class="c">${c.cry} ◆</i>`);for(const r in c.relics)p.push(`<i style="color:${RELIC[r].col}">${c.relics[r]} ${RELIC[r].ic} ${RELIC[r].nm}</i>`);return p.join(" · ")||"free";};
-let bSel=null;
+let bSel=null,bSelIdx=0;
 function levelRings(mesh,lv){for(const [th,col,y] of [[10,0xC0C8D8,.5],[25,0xFFD34D,.58],[40,0xB36BFF,.66]]){if(lv>=th){const ring=new THREE.Mesh(new THREE.BoxGeometry(.72,.06,.72),new THREE.MeshBasicMaterial({color:col}));ring.position.y=y;mesh.add(ring);}}}
+function trackPos(k,i){const t=TRACKS[k];const d=t.cells?t.cells[i]:t.cell;const p=(B2.pos[k]||[])[i];return (p&&cellAt(p[0],p[1]))?p:[d[0],d[1]];}
+function canMoveTo(k,cell){const t=TRACKS[k];if(!cell.buildable||cell.kind==="water")return "Can't build there";if(cell.b)return "Occupied";if(k==="mine"&&cell.kind!=="vein")return "Mines go on orange ore veins";if(k==="rig"&&cell.kind!=="vent")return "Gas rigs go on green vents";if(k!=="mine"&&k!=="rig"&&(cell.kind==="vein"||cell.kind==="vent"))return "Save that cell for a "+(cell.kind==="vein"?"mine":"gas rig");return null;}
+function moveTrack(k,i,cell){const w=canMoveTo(k,cell);if(w)return w;if(!B2.pos[k])B2.pos[k]=[];B2.pos[k][i]=[cell.x,cell.z];saveB2();refreshTrack(k);return null;}
 function placePermanent(base,only){for(const k of TRACK_KEYS){if(only&&k!==only)continue;const t=TRACKS[k];const lv=LV(k),spec=SPEC(k);
-  if(t.perm&&k!=="hall"){for(const [x,z,at] of t.cells){if(lv<at)continue;const c=cellAt(x,z);if(!c||c.b)continue;place(t.key,c,{k,lv,spec});}}
-  else if(t.tower&&base){const c=cellAt(t.cell[0],t.cell[1]);if(!c||c.b)continue;if(lv>0){place(k,c,{k,lv,spec});}else{const g=voxel(mat(0x2a2f45),0,.55,0,.7,.1,.7);g.position.set(c.x-HALF,c.h,c.z-HALF);world.add(g);c.b={key:k,it:ITEMS[k],mesh:g,cell:c,track:k,locked:true,hp:1,maxhp:1};}}}
+  if(t.perm&&k!=="hall"){t.cells.forEach(([x,z,at],i)=>{if(lv<at)return;const p=trackPos(k,i);const c=cellAt(p[0],p[1]);if(!c||c.b)return;place(t.key,c,{k,lv,spec,idx:i});});}
+  else if(t.tower&&base){const p=trackPos(k,0);const c=cellAt(p[0],p[1]);if(!c||c.b)continue;if(lv>0){place(k,c,{k,lv,spec,idx:0});}else{const g=voxel(mat(0x2a2f45),0,.55,0,.7,.1,.7);g.position.set(c.x-HALF,c.h,c.z-HALF);world.add(g);c.b={key:k,it:ITEMS[k],mesh:g,cell:c,track:k,idx:0,locked:true,hp:1,maxhp:1};}}}
   S.hall.track="hall";if(!S.hall.rings){S.hall.rings=true;levelRings(S.hall.mesh,LV("hall"));}}
 function refreshTrack(k){const t=TRACKS[k];if(k==="hall"){levelRings(S.hall.mesh,LV("hall"));return;}if(!t.perm&&!t.tower)return;
   for(const c of cells){if(c.b&&c.b.track===k){world.remove(c.b.mesh);if(c.b.house)S.house-=c.b.house;if(c.b.food)S.food-=c.b.food;S.buildings=S.buildings.filter(x=>x!==c.b);c.b=null;}}
@@ -625,11 +628,12 @@ function trackFx(k,l){const t=TRACKS[k];return l<=0?"Not built yet — first upg
 function renderCard(){const el=$("bcard");if(!bSel){el.classList.remove("show");return;}const k=bSel,t=TRACKS[k],lv=LV(k),sp=SPEC(k),q=B2.q.find(e=>e.k===k);const w=why(k);const c=upCost(k);
   const specHtml=(t.spec&&lv>=10&&!sp)?`<div class="sp"><div class="lab">CHOOSE A SPECIALISATION — permanent</div>${t.spec.map(s=>`<button class="btn alt" data-spec="${s[0]}">${s[0].toUpperCase()}<small>${s[1]}</small></button>`).join("")}</div>`:"";
   const next=lv>=50?"":trackFx(k,lv+1);
-  el.innerHTML=`<div class="hd"><b>${t.tower?"GUN PAD · ":""}${t.nm}</b><span>${lv>0?(t.tower?"PATTERN ":"LV ")+lv+" / 50":"LOCKED"}${sp?" · "+sp.toUpperCase():t.spec&&lv<10?" · specialise at Lv10":""}</span><button class="x" data-x="1">✕</button></div><div class="lore">${t.tower?LORE.tower:t.hero?LORE.hero:LORE.perm}</div><div class="fx">${lv>0?"Now: "+trackFx(k,lv):trackFx(k,0)}</div>${next?`<div class="fx nx">Lv${lv+1}: ${next}</div>`:""}${specHtml}${lv<50?`<div class="ct">${fmtCost(c)} · takes ${fmtT(upTime(k))}</div>`:""}<div class="gt ${q?"on":w?"":"ok"}" id="bGate">${q?"Upgrading — "+fmtT((q.end-Date.now())/1000)+" left":w||"Ready to upgrade"}</div><div class="bt">${q?`<button class="btn" data-hurry="1">HURRY ${hurryCost(q)} ◆</button>`:lv<50?`<button class="btn" data-up="1" ${w?"disabled":""}>${lv===0?"BUILD":"UPGRADE → LV"+(lv+1)}</button>`:""}</div>`;
+  el.innerHTML=`<div class="hd"><b>${t.tower?"GUN PAD · ":""}${t.nm}</b><span>${lv>0?(t.tower?"PATTERN ":"LV ")+lv+" / 50":"LOCKED"}${sp?" · "+sp.toUpperCase():t.spec&&lv<10?" · specialise at Lv10":""}</span><button class="x" data-x="1">✕</button></div><div class="lore">${t.tower?LORE.tower:t.hero?LORE.hero:LORE.perm}</div><div class="fx">${lv>0?"Now: "+trackFx(k,lv):trackFx(k,0)}</div>${next?`<div class="fx nx">Lv${lv+1}: ${next}</div>`:""}${specHtml}${lv<50?`<div class="ct">${fmtCost(c)} · takes ${fmtT(upTime(k))}</div>`:""}<div class="gt ${q?"on":w?"":"ok"}" id="bGate">${q?"Upgrading — "+fmtT((q.end-Date.now())/1000)+" left":w||"Ready to upgrade"}</div><div class="bt">${(t.cells||t.cell)&&k!=="hall"&&lv>0?`<button class="btn snd" data-move="1">MOVE</button>`:""}${q?`<button class="btn" data-hurry="1">HURRY ${hurryCost(q)} ◆</button>`:lv<50?`<button class="btn" data-up="1" ${w?"disabled":""}>${lv===0?"BUILD":"UPGRADE → LV"+(lv+1)}</button>`:""}</div>`;
   el.classList.add("show");
   el.querySelector("[data-x]").onclick=()=>{sfx.click();bSel=null;renderCard();};
   const up=el.querySelector("[data-up]");if(up)up.onclick=()=>{const r=startUp(k);if(r){tip(r);sfx.deny();}else{sfx.upgrade();tip(t.nm+" upgrade started — "+fmtT(B2.q[B2.q.length-1].dur));}renderCard();renderBaseHud();};
   const hu=el.querySelector("[data-hurry]");if(hu)hu.onclick=()=>{const r=hurry(k);if(r){tip(r);sfx.deny();}else{applyDone([k]);}renderCard();renderBaseHud();};
+  const mv=el.querySelector("[data-move]");if(mv)mv.onclick=()=>{sfx.click();S.moving={k,i:bSelIdx};el.classList.remove("show");tip("Tap a cell to move the "+t.nm+(k==="mine"?" (orange vein)":k==="rig"?" (green vent)":""));};
   el.querySelectorAll("[data-spec]").forEach(b=>b.onclick=()=>{const r=setSpec(k,b.dataset.spec);if(r){tip(r);sfx.deny();}else{sfx.level();tip(t.nm+": "+b.dataset.spec);refreshTrack(k);}renderCard();});}
 function renderBaseHud(){$("bOre").textContent=fmt(B2.ore);$("bGas").textContent=fmt(B2.gas);$("bCry").textContent=B2.cry;$("bRel").innerHTML=Object.keys(RELIC).map(r=>`<span style="color:${RELIC[r].col}">${RELIC[r].ic}${B2.relics[r]}</span>`).join("");$("bHall").textContent="Town Hall Lv "+LV("hall")+" · "+B2.runs+" run"+(B2.runs===1?"":"s");
   $("bq").innerHTML=B2.q.length?B2.q.map(e=>{const left=Math.max(0,(e.end-Date.now())/1000);const pct=Math.max(2,100*(1-left/e.dur));return `<div class="qr" data-k="${e.k}"><span>${TRACKS[e.k].nm} → Lv${LV(e.k)+1}</span><div class="tr"><div class="f" style="width:${pct}%"></div></div><b>${fmtT(left)}</b></div>`;}).join(""):`<div class="qr idle">Crews idle — tap a building, a turret pad or Ren to upgrade</div>`;
@@ -642,8 +646,9 @@ function basePointer(e){if(!downAt)return;const d=Math.hypot(e.clientX-downAt[0]
   ptr.x=(e.clientX/innerWidth)*2-1;ptr.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(ptr,cam);
   if(ray.intersectObject(S.hero.mesh,true).length){bSel="ren";renderCard();sfx.click();return;}
   const all=[S.hall,...S.buildings];const bh=ray.intersectObjects(all.map(b=>b.mesh),true);
-  if(bh.length){let o=bh[0].object,b=null;while(o&&!b){b=all.find(x=>x.mesh===o)||null;o=o.parent;}if(b&&b.track){bSel=b.track;renderCard();sfx.click();return;}}
-  const hits=ray.intersectObjects(cellMesh,false);if(hits.length){const cell=hits[0].object.userData.cell;if(cell.b&&cell.b.track){bSel=cell.b.track;renderCard();sfx.click();return;}}
+  if(S.moving){const mv=S.moving;const hits=ray.intersectObjects(cellMesh,false);if(!hits.length){S.moving=null;tip("Move cancelled");return;}const cell=hits[0].object.userData.cell;if(cell.b&&cell.b.track===mv.k&&(cell.b.idx||0)===mv.i){S.moving=null;tip("Move cancelled");return;}const w=moveTrack(mv.k,mv.i,cell);if(w){tip(w);sfx.deny();}else{S.moving=null;sfx.build();tip(TRACKS[mv.k].nm+" moved");bSel=mv.k;renderCard();}return;}
+  if(bh.length){let o=bh[0].object,b=null;while(o&&!b){b=all.find(x=>x.mesh===o)||null;o=o.parent;}if(b&&b.track){bSel=b.track;bSelIdx=b.idx||0;renderCard();sfx.click();return;}}
+  const hits=ray.intersectObjects(cellMesh,false);if(hits.length){const cell=hits[0].object.userData.cell;if(cell.b&&cell.b.track){bSel=cell.b.track;bSelIdx=cell.b.idx||0;renderCard();sfx.click();return;}}
   bSel=null;renderCard();}
 function initBase(){$("screen").classList.add("hide");$("hud").style.display="none";$("cards").style.display="none";$("actions").style.display="none";$("bhud").classList.add("on");
   const hrs=Math.min(8,Math.max(0,(Date.now()-(B2.last||Date.now()))/3.6e6));
@@ -651,7 +656,7 @@ function initBase(){$("screen").classList.add("hide");$("hud").style.display="no
   S.hero.tx=S.hero.x;S.hero.tz=S.hero.z;S.camVel=.004;AUDIO.music("intro");renderBaseHud();
   $("bPlay").addEventListener("click",()=>{sfx.click();goPlay();});$("bRen").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel="ren";renderCard();});
   $("bSnd").addEventListener("click",()=>{sfx.unlock();const m=AUDIO.cycle();$("bSnd").textContent=m===2?"SOUND":m===1?"SFX ONLY":"MUTED";});
-  window.__base={sel:k=>{bSel=k;renderCard();},up:startUp,hurry:k=>{const r=hurry(k);if(!r)applyDone([k]);renderBaseHud();return r;},spec:setSpec,why,cost:upCost,time:upTime,hud:renderBaseHud,tick:baseTick};}
+  window.__base={move:(k,i,x,z)=>moveTrack(k,i,cellAt(x,z)),sel:k=>{bSel=k;renderCard();},up:startUp,hurry:k=>{const r=hurry(k);if(!r)applyDone([k]);renderBaseHud();return r;},spec:setSpec,why,cost:upCost,time:upTime,hud:renderBaseHud,tick:baseTick};}
 // ---------- accounts + cloud save (Firebase Auth + Firestore; optional — the game runs fully offline without it) ----------
 // Config comes from window.HOLDFAST_FIREBASE (www/firebase-config.js in the app bundle). No config → the account screen explains how to set it up.
 const CLOUD=(()=>{
@@ -667,7 +672,7 @@ const CLOUD=(()=>{
   // ----- merge rules: keep the best of both saves -----
   function mergeB2(a,b){if(!a)return b;if(!b)return a;const r=JSON.parse(JSON.stringify(a));for(const k in r.tr){const x=(b.tr||{})[k]||{};r.tr[k].lv=Math.max(r.tr[k].lv||0,x.lv||0);r.tr[k].spec=r.tr[k].spec||x.spec||null;}
     for(const k of ["ore","gas","cry","runs"])r[k]=Math.max(a[k]||0,b[k]||0);for(const k in r.relics)r.relics[k]=Math.max(a.relics[k]||0,(b.relics||{})[k]||0);
-    const q=[...(a.q||[])];for(const e of (b.q||[]))if(!q.some(x=>x.k===e.k))q.push(e);r.q=q.filter(e=>r.tr[e.k]&&r.tr[e.k].lv<50);r.last=Math.max(a.last||0,b.last||0);return r;}
+    const q=[...(a.q||[])];for(const e of (b.q||[]))if(!q.some(x=>x.k===e.k))q.push(e);r.q=q.filter(e=>r.tr[e.k]&&r.tr[e.k].lv<50);r.last=Math.max(a.last||0,b.last||0);r.pos=Object.assign({},b.pos||{},a.pos||{});return r;}
   function mergeSave(a,b){a=a||{};b=b||{};return {ch2:!!(a.ch2||b.ch2),ch3:!!(a.ch3||b.ch3),heroLv:Math.max(a.heroLv||1,b.heroLv||1),cry:Math.max(a.cry||0,b.cry||0),ch1Stars:Math.max(a.ch1Stars||0,b.ch1Stars||0)};}
   const local=()=>{let b=null,s=null;try{b=JSON.parse(localStorage.getItem("holdfast.base2")||"null");s=JSON.parse(localStorage.getItem("holdfast.save")||"null");}catch(e){}return {b,s};};
   const doc=()=>fb.firestore().collection("players").doc(user.uid);

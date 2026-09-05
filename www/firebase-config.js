@@ -1,7 +1,11 @@
-// Orbital Holdfast — cloud accounts. Paste the Firebase web app config here (Firebase console → Project settings →
-// Your apps → Web app → "Config"). These values are public client identifiers, not secrets. Leave null to run offline-only.
-window.HOLDFAST_FIREBASE = null;
-// Example:
-// window.HOLDFAST_FIREBASE = { apiKey: "...", authDomain: "orbital-holdfast.firebaseapp.com", projectId: "orbital-holdfast",
-//   storageBucket: "orbital-holdfast.appspot.com", messagingSenderId: "...", appId: "1:...:web:...",
-//   appleClientId: "com.cubiccm.holdfast" };
+// Orbital Holdfast — cloud accounts (Firebase project "orbital-holdfast").
+// These are public client identifiers, not secrets; access is controlled by Firestore security rules.
+window.HOLDFAST_FIREBASE = {
+  apiKey: "AIzaSyBXzmSWwmYeq6hDAOQhQqoy9VarueLEdZc",
+  authDomain: "orbital-holdfast.firebaseapp.com",
+  projectId: "orbital-holdfast",
+  storageBucket: "orbital-holdfast.firebasestorage.app",
+  messagingSenderId: "2061544859",
+  appId: "1:2061544859:web:6e87e35142a81b38c9c53e",
+  appleClientId: "com.cubiccm.holdfast"
+};
