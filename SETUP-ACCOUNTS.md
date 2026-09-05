@@ -1,4 +1,12 @@
-# Player accounts & cloud saves — one-time setup
+# Player accounts & cloud saves — setup status
+
+**Done (5 Sep 2026):** Firebase project `orbital-holdfast` (org cubiccm.com, Analytics off), Email/Password + Google + Apple
+sign-in enabled, Firestore (Sydney) with the rules below, web app `holdfast-web` registered and its config in
+`www/firebase-config.js`, iOS app `com.cubiccm.holdfast` registered.
+
+**Still to do:** Google sign-in on iOS needs the iOS OAuth client id — Google Cloud console →
+APIs & Services → Credentials → "iOS client (auto created by Google Service)" → copy the Client ID and its
+reversed form into `capacitor.config.json` and `ios/App/App/Info.plist` as in step 2 below.
 
 The game code is ready: an **ACCOUNT** button (title screen and Home Base) offers Sign in with Apple, Google and
 email + password, and saves `holdfast.base2` + `holdfast.save` to Firestore (`players/{uid}`) after every run and
