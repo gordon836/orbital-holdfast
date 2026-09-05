@@ -136,6 +136,13 @@
   #bcard .chip small{font-weight:700;color:var(--mute);font-size:10px} #bcard .chip.on{border-color:var(--gas);background:rgba(88,214,141,.15)}
   #bcard .ar{display:flex;align-items:center;gap:8px;justify-content:space-between;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 9px}
   #bcard .ar div{display:flex;flex-direction:column;gap:1px} #bcard .ar small{color:var(--mute);font-size:10px;font-weight:700} #bcard .ar small.c{color:var(--laser)} #bcard .ar .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle} #bcard .ar.done{opacity:.7} #bcard .ar.done small.c{color:var(--gas)} #bcard .ar .btn{padding:7px 9px;font-size:10px;white-space:nowrap}
+  #coach{position:absolute;left:10px;right:10px;top:calc(env(safe-area-inset-top) + 150px);display:none;align-items:flex-start;gap:8px;background:rgba(20,28,63,.96);border:2px solid var(--gold);border-radius:12px;padding:8px 8px 8px 10px;font-size:12px;font-weight:700;z-index:8;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+  #coach.on{display:flex} #coach.alt{border-color:var(--line);opacity:.92}
+  body.base #coach{top:calc(env(safe-area-inset-top) + 176px)}
+  #coach .av{flex:0 0 34px;width:34px;height:34px;border-radius:8px;background:linear-gradient(160deg,#b8722c,#6b3f12);border:2px solid #f3d9a4;position:relative} #coach .av:after{content:"";position:absolute;left:9px;top:7px;width:12px;height:12px;background:#f3d9a4;border-radius:3px;box-shadow:0 14px 0 2px #d9b27a}
+  #coach .tx{flex:1;line-height:1.35;color:var(--ink)} #coach .tx b{display:block;font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:2px}
+  #coach .bt{display:flex;flex-direction:column;gap:4px;align-items:flex-end} #coach .btn{padding:6px 9px;font-size:10px} #coach .x{background:none;border:0;color:var(--mute);font-size:15px;padding:0 4px}
+  .hi{animation:hi 1s ease-in-out infinite;position:relative;z-index:7} @keyframes hi{0%,100%{box-shadow:0 0 0 3px rgba(255,211,77,.0)}50%{box-shadow:0 0 0 5px rgba(255,211,77,.9)}}
   #stg{position:absolute;inset:0;background:rgba(6,10,30,.92);display:none;align-items:flex-end;justify-content:center;padding:10px;z-index:40}
   #stg.show{display:flex}
   #stg .box{width:100%;max-width:520px;max-height:92%;overflow:auto;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:700}
@@ -202,6 +209,7 @@
   </div>
   <div id="cards"></div>
   <div id="stg"></div>
+  <div id="coach"></div>
   <div id="bhud">
     <div class="res">
       <div class="pill ore"><span class="ic"></span><span id="bOre">0</span></div>
@@ -326,7 +334,7 @@ const ADDONS={
 };
 const ADDON_KEYS=Object.keys(ADDONS);const addonSlots=()=>LV("lab")>=25?2:1;
 const LORE={perm:"Dug into bedrock — the tide can't take it. Stands on the island from wave 1 of every run.",tower:"Built on its pad here, this gun stands on the island from wave 1 of every run and keeps its experience between runs. Old Tam keeps the pattern — every upgrade sharpens its power, range or speed, and relics from the rocks and ships become add-ons.",hero:"Ren fixes things. People are looking at her.",lab:"Tam's workshop. Relics that fall from broken rocks and downed ships are studied here and turned into gun add-ons."};
-function newB2(){const tr={};for(const k of TRACK_KEYS){tr[k]={lv:TRACKS[k].lv0===0?0:1,spec:null};if(TRACKS[k].tower)Object.assign(tr[k],{pow:0,rng:0,spd:0,fit:[]});}return {v:2,ore:0,gas:0,cry:0,relics:{seam:0,core:0,drill:0,lens:0},runs:0,tr,q:[],pos:{},addons:{},guns:[],grid:15,stg:{best:0,stars:{},clears:{}},last:Date.now()};}
+function newB2(){const tr={};for(const k of TRACK_KEYS){tr[k]={lv:TRACKS[k].lv0===0?0:1,spec:null};if(TRACKS[k].tower)Object.assign(tr[k],{pow:0,rng:0,spd:0,fit:[]});}return {v:2,ore:0,gas:0,cry:0,relics:{seam:0,core:0,drill:0,lens:0},runs:0,tr,q:[],pos:{},addons:{},guns:[],grid:15,stg:{best:0,stars:{},clears:{}},tut:{step:0,off:false},last:Date.now()};}
 let B2=null;
 try{const raw=localStorage.getItem("holdfast.base2");if(raw){const b=JSON.parse(raw);B2=Object.assign(newB2(),b);B2.relics=Object.assign({seam:0,core:0,drill:0,lens:0},b.relics||{});const tr=newB2().tr;for(const k in tr)tr[k]=Object.assign(tr[k],(b.tr||{})[k]||{});B2.tr=tr;B2.q=Array.isArray(b.q)?b.q.filter(e=>TRACKS[e.k]||(e.k&&e.k.startsWith("addon:"))):[];B2.pos=(b.pos&&typeof b.pos==='object')?b.pos:{};B2.addons=(b.addons&&typeof b.addons==='object')?b.addons:{};if(b.grid!==15){B2.pos={};B2.guns=[];}B2.grid=15;B2.guns=Array.isArray(b.guns)?b.guns.filter(g=>g&&ITEMS[g.k]):[];for(const k of TRACK_KEYS){const o=B2.tr[k];if(TRACKS[k].tower){if(!Array.isArray(o.fit))o.fit=[];if(o.lv>1&&!(o.pow+o.rng+o.spd))o.pow=o.lv-1;}}}}catch(e){B2=null;}
 if(!B2){B2=newB2();try{const o=JSON.parse(localStorage.getItem("holdfast.base")||"null");if(o){const r=o.r||{};const cap=v=>Math.max(1,Math.min(50,v));B2.cry=o.bank||0;B2.runs=o.runs||0;B2.tr.hall.lv=cap(1+((o.hall||1)-1)*3+(r.log||0)*2);B2.tr.factory.lv=cap(1+(r.bal||0)*3);B2.tr.mine.lv=cap(1+(r.mine||0)*3);B2.tr.ren.lv=cap(1+(r.ren||0)*3);B2.tr.shelter.lv=cap(1+(r.hard||0)*3);}}catch(e){}}
@@ -833,7 +841,7 @@ function basePointer(e){if(!downAt)return;const d=Math.hypot(e.clientX-downAt[0]
   if(bh.length){let o=bh[0].object,b=null;while(o&&!b){b=all.find(x=>x.mesh===o)||null;o=o.parent;}if(b&&b.gun!==undefined){sfx.click();renderGunCard(b.gun);return;}if(b&&b.track){bSel=b.track;bSelIdx=b.idx||0;renderCard();sfx.click();return;}}
   const hits=ray.intersectObjects(cellMesh,false);if(hits.length){const cell=hits[0].object.userData.cell;if(cell.b&&cell.b.gun!==undefined){sfx.click();renderGunCard(cell.b.gun);return;}if(cell.b&&cell.b.track){bSel=cell.b.track;bSelIdx=cell.b.idx||0;renderCard();sfx.click();return;}}
   bSel=null;renderCard();}
-function initBase(){$("screen").classList.add("hide");$("hud").style.display="none";$("cards").style.display="none";$("actions").style.display="none";$("bhud").classList.add("on");
+function initBase(){document.body.classList.add("base");$("screen").classList.add("hide");$("hud").style.display="none";$("cards").style.display="none";$("actions").style.display="none";$("bhud").classList.add("on");
   const hrs=Math.min(8,Math.max(0,(Date.now()-(B2.last||Date.now()))/3.6e6));
   if(hrs>=.05){let o=0,g=0;for(const b of S.buildings){if(b.perm){o+=(b.oreW||0)*2*hrs;g+=(b.gasW||0)*2*hrs;}}o=Math.round(o);g=Math.round(g);if(o||g){B2.ore+=o;B2.gas+=g;saveB2();setTimeout(()=>tip(`While you were away (${hrs.toFixed(1)}h): +${o} ore, +${g} gas`),700);}}
   S.hero.tx=S.hero.x;S.hero.tz=S.hero.z;S.camVel=.004;AUDIO.music("intro");renderBaseHud();if(!B2.seenBase){B2.seenBase=true;saveB2();setTimeout(()=>tip("Tap a building, gun pad or Ren to upgrade — guns built here fight in every run"),1500);}
@@ -855,7 +863,7 @@ const CLOUD=(()=>{
   // ----- merge rules: keep the best of both saves -----
   function mergeB2(a,b){if(!a)return b;if(!b)return a;const r=JSON.parse(JSON.stringify(a));for(const k in r.tr){const x=(b.tr||{})[k]||{};r.tr[k].lv=Math.max(r.tr[k].lv||0,x.lv||0);r.tr[k].spec=r.tr[k].spec||x.spec||null;for(const s of ["pow","rng","spd"])if(r.tr[k][s]!==undefined||x[s]!==undefined)r.tr[k][s]=Math.max(r.tr[k][s]||0,x[s]||0);if(r.tr[k].fit||x.fit)r.tr[k].fit=[...new Set([...(r.tr[k].fit||[]),...(x.fit||[])])].slice(0,2);}r.addons=Object.assign({},b.addons||{},a.addons||{});
     for(const k of ["ore","gas","cry","runs"])r[k]=Math.max(a[k]||0,b[k]||0);for(const k in r.relics)r.relics[k]=Math.max(a.relics[k]||0,(b.relics||{})[k]||0);
-    const q=[...(a.q||[])];for(const e of (b.q||[]))if(!q.some(x=>x.k===e.k))q.push(e);r.q=q.filter(e=>r.tr[e.k]&&r.tr[e.k].lv<50);r.last=Math.max(a.last||0,b.last||0);r.pos=Object.assign({},b.pos||{},a.pos||{});const gs=[...(a.guns||[])];for(const g of (b.guns||[])){const s=gs.find(x=>x.x===g.x&&x.z===g.z);if(!s)gs.push(g);else if((g.xp||0)>(s.xp||0)){s.xp=g.xp;s.lv=g.lv;}}r.guns=gs;const sa=a.stg||{best:0,stars:{},clears:{}},sb=b.stg||{best:0,stars:{},clears:{}};const st={best:Math.max(sa.best||0,sb.best||0),stars:{},clears:{}};for(const k of new Set([...Object.keys(sa.stars||{}),...Object.keys(sb.stars||{})]))st.stars[k]=Math.max((sa.stars||{})[k]||0,(sb.stars||{})[k]||0);for(const k of new Set([...Object.keys(sa.clears||{}),...Object.keys(sb.clears||{})]))st.clears[k]=Math.max((sa.clears||{})[k]||0,(sb.clears||{})[k]||0);r.stg=st;return r;}
+    const q=[...(a.q||[])];for(const e of (b.q||[]))if(!q.some(x=>x.k===e.k))q.push(e);r.q=q.filter(e=>r.tr[e.k]&&r.tr[e.k].lv<50);r.last=Math.max(a.last||0,b.last||0);r.pos=Object.assign({},b.pos||{},a.pos||{});const gs=[...(a.guns||[])];for(const g of (b.guns||[])){const s=gs.find(x=>x.x===g.x&&x.z===g.z);if(!s)gs.push(g);else if((g.xp||0)>(s.xp||0)){s.xp=g.xp;s.lv=g.lv;}}r.guns=gs;const sa=a.stg||{best:0,stars:{},clears:{}},sb=b.stg||{best:0,stars:{},clears:{}};const st={best:Math.max(sa.best||0,sb.best||0),stars:{},clears:{}};for(const k of new Set([...Object.keys(sa.stars||{}),...Object.keys(sb.stars||{})]))st.stars[k]=Math.max((sa.stars||{})[k]||0,(sb.stars||{})[k]||0);for(const k of new Set([...Object.keys(sa.clears||{}),...Object.keys(sb.clears||{})]))st.clears[k]=Math.max((sa.clears||{})[k]||0,(sb.clears||{})[k]||0);r.stg=st;const ta=a.tut||{step:0,off:false},tb=b.tut||{step:0,off:false};r.tut={step:Math.max(ta.step||0,tb.step||0),off:!!(ta.off||tb.off)};return r;}
   function mergeSave(a,b){a=a||{};b=b||{};return {ch2:!!(a.ch2||b.ch2),ch3:!!(a.ch3||b.ch3),heroLv:Math.max(a.heroLv||1,b.heroLv||1),cry:Math.max(a.cry||0,b.cry||0),ch1Stars:Math.max(a.ch1Stars||0,b.ch1Stars||0)};}
   const local=()=>{let b=null,s=null;try{b=JSON.parse(localStorage.getItem("holdfast.base2")||"null");s=JSON.parse(localStorage.getItem("holdfast.save")||"null");}catch(e){}return {b,s};};
   const doc=()=>fb.firestore().collection("players").doc(user.uid);
@@ -951,8 +959,8 @@ function renderDaily(){ensureDaily();const el=$("bcard");const d=B2.daily,w=B2.w
     <div class="ar ${d.claimed?"done":""}"><div><b>Supply drop</b><small>${d.claimed?"Come back tomorrow for "+rwText(DAILY_RW[d.streak%7]):"Today: "+rwText(rw)+" · day 7 of a streak brings a relic"}</small></div>${d.claimed?"":`<button class="btn" data-daily="1">CLAIM</button>`}</div>
     <div class="ad"><div class="lab">DAILY BOUNTIES — reset at midnight</div>${rows}</div>
     <div class="ad"><div class="lab">THIS WEEK</div><div class="ar ${w.claimed?"done":""}"><div><b>${WEEKLY.txt}</b><small>${rwText(WEEKLY.rw)}</small><div class="tr"><div class="f" style="width:${wp}%"></div></div><small class="c">${w.claimed?"Claimed":w.n+" / "+WEEKLY.goal}</small></div>${w.claimed?"":`<button class="btn ${wdone?"":"snd"}" data-claim="wins" ${wdone?"":"disabled"}>${wdone?"CLAIM":"…"}</button>`}</div></div>
-    <div class="lore">${nextGoal()}</div>`;
-  el.classList.add("show");el.querySelector("[data-x]").onclick=()=>{sfx.click();el.classList.remove("show");};
+    <div class="lore">${nextGoal()}</div><div class="bt"><button class="btn snd" data-tut="1">${(B2.tut&&!B2.tut.off)?"TAM'S WALKTHROUGH IS ON":"REPLAY TAM'S WALKTHROUGH"}</button></div>`;
+  el.classList.add("show");el.querySelector("[data-x]").onclick=()=>{sfx.click();el.classList.remove("show");};const tb=el.querySelector("[data-tut]");if(tb)tb.onclick=()=>{sfx.click();B2.tut={step:0,off:false};saveB2();tip("Old Tam will pick it up from Stage 1 — tap PLAY");el.classList.remove("show");if(typeof tutRender==="function")tutRender(true);};
   const dd=el.querySelector("[data-daily]");if(dd)dd.onclick=()=>{const r=claimDaily();if(r){tip(r);sfx.deny();}else{sfx.crystal();tip("Supply drop claimed — day "+B2.daily.streak);}renderDaily();renderBaseHud();};
   el.querySelectorAll("[data-claim]").forEach(b=>b.onclick=()=>{const r=claimBounty(b.dataset.claim);if(r){tip(r);sfx.deny();}else{sfx.crystal();tip("Bounty claimed");}renderDaily();renderBaseHud();});}
 // local notifications for finished upgrades (native app only; silently skipped on the web)
@@ -1012,6 +1020,51 @@ function renderStages(from){const el=$("stg");const best=B2.stg.best;const cur=M
   const pb=el.querySelector("[data-play]");if(pb)pb.onclick=()=>{sfx.click();selectStage(+pb.dataset.play);if(S.baseMode)goPlay();else{try{localStorage.removeItem("holdfast.mode");}catch(e){}location.reload();}};
   const t=el.querySelector(".tab.on");if(t)t.scrollIntoView({inline:"center",block:"nearest"});}
 window.__stages=renderStages;
+
+// ---------- Old Tam's walkthrough: guided missions for new players until every building is Lv2 ----------
+const TUT=[
+  // stage 1 run
+  {id:"gun",where:"run",txt:"Tam — \"Rocks incoming. Tap the CANNON card, then tap a green cell next to the hall.\"",hi:()=>cardEls.cannon,show:()=>{S.sel="cannon";updateCards();tip("Now tap a green cell near the hall");},done:()=>S.buildings.some(b=>b.it.type==="tower"&&!b.anchored)},
+  {id:"start",where:"run",txt:"Tam — \"Gun's up. Hit START WAVE — rocks fall for 30 seconds, then you get a breather to build.\"",hi:()=>$("bSkip"),done:()=>S.wave>0||S.phase==="combat"},
+  {id:"gun2",where:"run",txt:"Tam — \"Rocks drop ore when they break. Between waves, put up a second gun on the other side of the hall.\"",hi:()=>cardEls.cannon,show:()=>{S.sel="cannon";updateCards();},done:()=>S.buildings.filter(b=>b.it.type==="tower"&&!b.anchored).length>=2||S.wave>=2},
+  {id:"pod",where:"run",txt:"Tam — \"That's an escape pod — people. Tap the ground beside it and Ren will run over. Reach it before the wave ends.\"",skipIf:()=>S.wave>=3,done:()=>S.rescued>0||S.wave>=3},
+  {id:"ring",where:"run",txt:"Tam — \"Tap a gun to see its range ring, and tap it again to post Ren there: +50% fire rate, and she repairs it. Hold to the end of the stage.\"",done:()=>S.over&&!!S.stageRw},
+  // home base, round 1
+  {id:"home",where:"result",txt:"Tam — \"Everything left over got banked. Tap HOME BASE — that's where the real building happens.\"",hi:()=>document.querySelector('#screen button[onclick*="__openBase"]'),done:()=>S.baseMode},
+  {id:"mine",where:"base",txt:"Tam — \"This is your island — it holds through the tide. Tap the ORE MINE on the orange vein and UPGRADE it to Lv2. Mines feed every run.\"",show:()=>{bSel="mine";renderCard();},done:()=>LV("mine")>=2,cost:["mine"]},
+  {id:"hall",where:"base",txt:"Tam — \"Now the TOWN HALL to Lv2 — every hall level adds housing and crews, and unlocks more of the island.\"",show:()=>{bSel="hall";renderCard();},done:()=>LV("hall")>=2,cost:["hall"]},
+  {id:"stage2",where:"any",txt:"Tam — \"Out of ore? Tap PLAY and clear STAGE 2. A first clear pays a bonus on top of what you bank.\"",hi:()=>S.baseMode?$("bPlay"):null,show:()=>{if(S.baseMode){stgSec=null;stgPick=null;renderStages("base");}},done:()=>B2.stg.best>=2},
+  {id:"farm",where:"base",txt:"Tam — \"Bo wants the FARM at Lv2 and Asha wants a SHELTER at Lv2 — fed, housed crews work at full output.\"",show:()=>{bSel=LV("farm")<2?"farm":"shelter";renderCard();},done:()=>LV("farm")>=2&&LV("shelter")>=2,cost:["farm","shelter"]},
+  {id:"rig",where:"base",txt:"Tam — \"GAS RIG on the green vent and the FACTORY to Lv2. Gas pays for lasers and missiles; the factory sharpens every gun.\"",show:()=>{bSel=LV("rig")<2?"rig":"factory";renderCard();},done:()=>LV("rig")>=2&&LV("factory")>=2,cost:["rig","factory"]},
+  {id:"stage3",where:"any",txt:"Tam — \"One more run for the last of it. PLAY → STAGE 3.\"",hi:()=>S.baseMode?$("bPlay"):null,show:()=>{if(S.baseMode){stgSec=null;stgPick=null;renderStages("base");}},done:()=>B2.stg.best>=3},
+  {id:"lab",where:"base",txt:"Tam — \"RESEARCH CENTRE to Lv2 — it turns relics into add-ons. And REN to Lv2: she hits harder and repairs faster.\"",show:()=>{bSel=LV("lab")<2?"lab":"ren";renderCard();},done:()=>LV("lab")>=2&&LV("ren")>=2,cost:["lab","ren"]},
+  {id:"guns",where:"base",txt:"Tam — \"Last: the three GUN PADS — Cannon, Laser, Missile — each to pattern 2. Pick Power, Range or Speed. Those guns stand on the island in every run.\"",show:()=>{bSel=["cannon","laser","missile"].find(k=>LV(k)<2)||"cannon";renderCard();},done:()=>LV("cannon")>=2&&LV("laser")>=2&&LV("missile")>=2,cost:["cannon","laser","missile"]},
+  {id:"today",where:"base",txt:"Tam — \"Every building at Lv2. That's a town again. Tap TODAY for your supply drop and bounties — and keep climbing the stages.\"",hi:()=>$("bToday"),done:()=>!!(B2.daily&&B2.daily.claimed)},
+];
+function tutState(){if(!B2.tut||typeof B2.tut!=="object")B2.tut={step:0,off:(B2.runs>0||(B2.stg&&B2.stg.best>0))};return B2.tut;}
+let tutHi=null,tutShownId=null;
+function tutStep(){const t=tutState();if(t.off||t.step>=TUT.length)return null;return TUT[t.step];}
+function tutAdvance(){const t=tutState();t.step++;saveB2();if(t.step>=TUT.length){t.off=true;t.doneAt=Date.now();B2.cry+=10;saveB2();banner("TOWN REBUILT","Tam's lessons are done — +10 crystal");if(typeof sfx!=="undefined")sfx.level();}else{if(typeof sfx!=="undefined")sfx.click();}tutRender(true);}
+function tutMode(){if(S.baseMode)return "base";if(S.over&&!$("screen").classList.contains("hide"))return "result";if(S.started)return "run";return "title";}
+function tutRender(force){const el=$("coach");const st=tutStep();if(!st){el.classList.remove("on");if(tutHi){tutHi.classList.remove("hi");tutHi=null;}return;}
+  const mode=tutMode();let txt=st.txt,alt=false;
+  if(st.where==="run"&&mode!=="run"){alt=true;txt=mode==="base"?"Tam — \"Lesson's in the field. Tap PLAY → Stage 1.\"":mode==="title"?"Tam — \"Start the stage and I'll walk you through it.\"":txt;}
+  else if(st.where==="base"&&mode!=="base"){alt=true;txt=mode==="run"?"Tam — \"Finish this run, then back at the Home Base: "+st.txt.replace(/^Tam — "/,"").replace(/"$/,"")+"\"":mode==="result"?"Tam — \"Tap HOME BASE. "+st.txt.replace(/^Tam — "/,"").replace(/"$/,"")+"\"":txt;}
+  else if(st.where==="result"&&mode!=="result"){alt=true;txt=mode==="base"?"":"Tam — \"Hold to the end of the stage.\"";}
+  if(!txt){el.classList.remove("on");return;}
+  const key=st.id+"|"+mode;if(key!==tutShownId||force){tutShownId=key;const t=tutState();
+    let costTxt="";if(st.cost&&mode==="base"){const need=st.cost.filter(k=>LV(k)<2).reduce((a,k)=>a+(LV(k)<2?upCost(k).ore:0),0);if(need>0)costTxt=` · needs ${need} ore (you have ${fmt(B2.ore)})`;}
+    el.innerHTML=`<div class="av"></div><div class="tx"><b>MISSION ${Math.min(TUT.length,t.step+1)} / ${TUT.length}${costTxt}</b>${txt}</div><div class="bt">${(st.show&&!alt)||(st.where==="any"&&st.show&&mode==="base")?`<button class="btn" data-show="1">SHOW ME</button>`:""}<button class="x" data-skip="1" title="Skip the walkthrough">✕</button></div>`;
+    el.classList.add("on");el.classList.toggle("alt",alt);
+    const sb=el.querySelector("[data-show]");if(sb)sb.onclick=()=>{sfx.unlock();sfx.click();st.show();};
+    el.querySelector("[data-skip]").onclick=()=>{sfx.click();if(Date.now()-(window.__tutSkipArm||0)<3000){tutSkip();tip("Walkthrough skipped");}else{window.__tutSkipArm=Date.now();tip("Tap ✕ again to skip Tam's walkthrough");}};}
+  const h=(st.hi&&!alt)?st.hi():null;if(h!==tutHi){if(tutHi)tutHi.classList.remove("hi");tutHi=h;if(h)h.classList.add("hi");}}
+function tutSkip(){const t=tutState();t.off=true;saveB2();tutRender(true);}
+let tutT=0;
+function tutTick(raw){const st=tutStep();if(!st){if($("coach").classList.contains("on"))tutRender(true);return;}tutT+=raw;if(tutT<.4)return;tutT=0;
+  try{if(st.skipIf&&st.skipIf()){tutAdvance();return;}if(st.done()){tutAdvance();return;}}catch(e){}
+  tutRender(false);}
+window.__tut={state:tutState,step:tutStep,advance:tutAdvance,skip:tutSkip,render:tutRender,list:TUT};
 window.__guns={build:(k,x,z)=>buildGun(k,cellAt(x,z)),scrap:scrapGun,move:(i,x,z)=>moveGun(i,cellAt(x,z)),why:gunWhy,slots:gunSlots,render:renderGuns};
 for(const i of [0,1]){$("bNext"+i).addEventListener("click",()=>{sfx.unlock();AUDIO.music("intro");sfx.build();document.querySelectorAll("#screen .slide").forEach(sl=>sl.classList.toggle("on",+sl.dataset.i===i+1));S.camAngle+=.9;});}
 $("bStart").addEventListener("click",()=>{sfx.unlock();$("screen").classList.add("hide");S.started=true;S.camVel=.02;startBuild();sfx.build();if(S.rested)setTimeout(()=>banner("RESTED CREWS","+25% mine and rig income for 3 waves"),600);const ng=S.buildings.filter(b=>b.anchored).length;if(ng)setTimeout(()=>banner("ANCHORED GUNS STANDING",ng+" foundation gun"+(ng>1?"s":"")+" held through the tide"),S.rested?2400:600);if(B2.runs>0)setTimeout(()=>{if(!S.over)tip(ng?"The tide took last run's field guns — your anchored guns and Tam's patterns held":"The tide took last run's guns — the foundations and Tam's patterns held");},ng?3600:1200);});
@@ -1105,7 +1158,7 @@ function placeCam(){const w=innerWidth,h=innerHeight;const dist=(w<h?36:25)*(S.c
 function resize(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<h?46:34;cam.updateProjectionMatrix();placeCam();}
 addEventListener("resize",resize);resize();window.__cam=placeCam;window.__cells=cells;window.__world=world;window.__HALF=HALF;window.__camera=cam;
 function step(now){const raw=Math.min(.05,(now-last)/1000);last=now;if(!window.__manual)requestAnimationFrame(step);
-  if(bannerT>0){bannerT-=raw;if(bannerT<=0)$("banner").classList.remove("show");}
+  if(bannerT>0){bannerT-=raw;if(bannerT<=0)$("banner").classList.remove("show");}if(typeof tutTick==="function")tutTick(raw);
   if(S.cine){const c=S.cine;c.t-=raw;const k=1-Math.max(0,c.t/c.dur);const e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;S.camAngle=c.a0+(c.a1-c.a0)*e;S.camPitch=c.p0+(c.p1-c.p0)*e;placeCam();if(c.t<=0)S.cine=null;}
   const dt=S.cine?0:raw*S.speed;
   if(tipT>0){tipT-=dt;if(tipT<=0)$("tip").classList.remove("show");}
