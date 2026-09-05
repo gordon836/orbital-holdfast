@@ -641,7 +641,10 @@ function renderBaseHud(){$("bOre").textContent=fmt(B2.ore);$("bGas").textContent
 let lastBaseTick=0;
 function baseTick(){const done=finishQ();if(done.length)applyDone(done);renderBaseHud();
   if(bSel){const q=B2.q.find(e=>e.k===bSel);const g=$("bGate");if(q&&g){g.textContent="Upgrading — "+fmtT((q.end-Date.now())/1000)+" left";const hb=$("bcard").querySelector("[data-hurry]");if(hb)hb.textContent="HURRY "+hurryCost(q)+" ◆";}else if(done.length)renderCard();}
-  for(const b of [S.hall,...S.buildings]){if(!b.track)continue;const busy=B2.q.some(e=>e.k===b.track);if(busy&&!b.work){b.work=voxel(new THREE.MeshBasicMaterial({color:0xFFD34D}),0,2.3,0,.22,.22,.22,false);b.mesh.add(b.work);}else if(!busy&&b.work){b.mesh.remove(b.work);b.work=null;}}}
+  const seen=new Set();for(const b of [S.hall,...S.buildings]){if(!b.track)continue;const busy=B2.q.some(e=>e.k===b.track);if(busy&&!b.work){b.work=voxel(new THREE.MeshBasicMaterial({color:0xFFD34D}),0,2.3,0,.22,.22,.22,false);b.mesh.add(b.work);}else if(!busy&&b.work){b.mesh.remove(b.work);b.work=null;}
+    const ready=!busy&&!seen.has(b.track)&&!why(b.track);seen.add(b.track);if(ready&&!b.ready){const g=new THREE.Group();const a=new THREE.Mesh(new THREE.ConeGeometry(.16,.28,4),new THREE.MeshBasicMaterial({color:0x58D68D}));a.rotation.y=Math.PI/4;g.add(a);const s=new THREE.Mesh(new THREE.BoxGeometry(.1,.16,.1),new THREE.MeshBasicMaterial({color:0x58D68D}));s.position.y=-.2;g.add(s);g.position.y=2.3;b.mesh.add(g);b.ready=g;}else if(!ready&&b.ready){b.mesh.remove(b.ready);b.ready=null;}}
+  for(const c of cells){const b=c.b;if(b&&b.locked&&b.track){const ready=!why(b.track);if(ready&&!b.ready){const a=new THREE.Mesh(new THREE.ConeGeometry(.16,.28,4),new THREE.MeshBasicMaterial({color:0x58D68D}));a.rotation.y=Math.PI/4;a.position.y=1.2;b.mesh.add(a);b.ready=a;}else if(!ready&&b.ready){b.mesh.remove(b.ready);b.ready=null;}}}
+  $("bRen").textContent=(!B2.q.some(e=>e.k==="ren")&&!why("ren"))?"REN ▲":"REN";}
 function basePointer(e){if(!downAt)return;const d=Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1]);downAt=null;if(d>12||dragged)return;sfx.unlock();
   ptr.x=(e.clientX/innerWidth)*2-1;ptr.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(ptr,cam);
   if(ray.intersectObject(S.hero.mesh,true).length){bSel="ren";renderCard();sfx.click();return;}
@@ -653,7 +656,7 @@ function basePointer(e){if(!downAt)return;const d=Math.hypot(e.clientX-downAt[0]
 function initBase(){$("screen").classList.add("hide");$("hud").style.display="none";$("cards").style.display="none";$("actions").style.display="none";$("bhud").classList.add("on");
   const hrs=Math.min(8,Math.max(0,(Date.now()-(B2.last||Date.now()))/3.6e6));
   if(hrs>=.05){let o=0,g=0;for(const b of S.buildings){if(b.perm){o+=(b.oreW||0)*2*hrs;g+=(b.gasW||0)*2*hrs;}}o=Math.round(o);g=Math.round(g);if(o||g){B2.ore+=o;B2.gas+=g;saveB2();setTimeout(()=>tip(`While you were away (${hrs.toFixed(1)}h): +${o} ore, +${g} gas`),700);}}
-  S.hero.tx=S.hero.x;S.hero.tz=S.hero.z;S.camVel=.004;AUDIO.music("intro");renderBaseHud();
+  S.hero.tx=S.hero.x;S.hero.tz=S.hero.z;S.camVel=.004;AUDIO.music("intro");renderBaseHud();if(!B2.seenBase){B2.seenBase=true;saveB2();setTimeout(()=>tip("Tap any building, gun pad or Ren to upgrade it — green arrows mean ready"),1500);}
   $("bPlay").addEventListener("click",()=>{sfx.click();goPlay();});$("bRen").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel="ren";renderCard();});
   $("bSnd").addEventListener("click",()=>{sfx.unlock();const m=AUDIO.cycle();$("bSnd").textContent=m===2?"SOUND":m===1?"SFX ONLY":"MUTED";});
   window.__base={move:(k,i,x,z)=>moveTrack(k,i,cellAt(x,z)),sel:k=>{bSel=k;renderCard();},up:startUp,hurry:k=>{const r=hurry(k);if(!r)applyDone([k]);renderBaseHud();return r;},spec:setSpec,why,cost:upCost,time:upTime,hud:renderBaseHud,tick:baseTick};}
@@ -888,7 +891,7 @@ function step(now){const raw=Math.min(.05,(now-last)/1000);last=now;requestAnima
     }
     heroCheck();
   }
-  if(S.baseMode){const tk=(now/500)|0;if(tk!==lastBaseTick){lastBaseTick=tk;baseTick();}for(const b of [S.hall,...S.buildings]){if(b.work){b.work.rotation.y+=dt*3;b.work.position.y=2.3+Math.sin(now*.004)*.12;}}}
+  if(S.baseMode){const tk=(now/500)|0;if(tk!==lastBaseTick){lastBaseTick=tk;baseTick();}for(const b of [S.hall,...S.buildings]){if(b.work){b.work.rotation.y+=dt*3;b.work.position.y=2.3+Math.sin(now*.004)*.12;}if(b.ready){b.ready.position.y=2.3+Math.sin(now*.005)*.1;}}}
   if(S.tide!==undefined&&S.tide!==null){S.tide+=raw;for(const b of S.buildings){if(b.it.type!=="tower")continue;const k=Math.max(0,S.tide-.6);b.mesh.position.y=b.cell.h+k*k*1.6;b.mesh.rotation.y+=raw*(.4+k*.6);b.mesh.rotation.z=Math.sin(S.tide*2)*.12;}}
   // reticle follows the lowest falling asteroid
   {let low=null;for(const en of S.enemies){if(en.fly||en.boss)continue;if(!low||en.mesh.position.y<low.mesh.position.y)low=en;}
