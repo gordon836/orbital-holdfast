@@ -66,6 +66,31 @@ platform :ios do
       Dir[File.join(SIGN_DIR, "*.p12"), File.join(SIGN_DIR, "*.cer")].each { |f| File.delete(f) }
     end
 
+    # Sign in with Apple: make sure the App ID has the capability, then ship the entitlement.
+    ent_args = ""
+    begin
+      Spaceship::ConnectAPI.token ||= Spaceship::ConnectAPI::Token.from(hash: api_key)
+      bid = Spaceship::ConnectAPI::BundleId.all(filter: { identifier: APP_ID }, includes: "bundleIdCapabilities").find { |b| b.identifier == APP_ID }
+      UI.user_error!("Bundle id #{APP_ID} not found") unless bid
+      has = (bid.bundle_id_capabilities || []).any? { |c| c.capability_type.to_s == "SIGN_IN_WITH_APPLE" }
+      unless has
+        UI.message("Enabling Sign in with Apple on #{APP_ID}")
+        bid.create_capability("SIGN_IN_WITH_APPLE", settings: [{ key: "APPLE_ID_AUTH_APP_CONSENT", options: [{ key: "PRIMARY_APP_CONSENT" }] }])
+      end
+      ent = File.expand_path("../ios/App/App/App.entitlements", __dir__)
+      File.write(ent, <<~PLIST)
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0"><dict>
+          <key>com.apple.developer.applesignin</key><array><string>Default</string></array>
+        </dict></plist>
+      PLIST
+      ent_args = " CODE_SIGN_ENTITLEMENTS=App/App.entitlements"
+      UI.success("Sign in with Apple entitlement on")
+    rescue => e
+      UI.important("Sign in with Apple not enabled this build: #{e.message}")
+    end
+
     get_provisioning_profile(api_key: api_key, app_identifier: APP_ID, cert_id: cert_id, force: true)
     profile_name = lane_context[SharedValues::SIGH_NAME]
     profile_path = lane_context[SharedValues::SIGH_PROFILE_PATH]
@@ -88,7 +113,7 @@ platform :ios do
 
     build_app(
       workspace: XCWS, scheme: "App", configuration: "Release", export_method: "app-store",
-      xcargs: "CURRENT_PROJECT_VERSION=#{build_no} DEVELOPMENT_TEAM=#{team_id}",
+      xcargs: "CURRENT_PROJECT_VERSION=#{build_no} DEVELOPMENT_TEAM=#{team_id}#{ent_args}",
       export_options: { provisioningProfiles: { APP_ID => profile_name }, signingStyle: "manual", teamID: team_id },
       output_directory: "build", output_name: "OrbitalHoldfast.ipa"
     )
