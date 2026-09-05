@@ -9,11 +9,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Holdfast">
 <meta name="theme-color" content="#0B1230">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Holdfast">
-<meta name="theme-color" content="#0B1230">
 <style>
   :root{
     --space:#0B1230; --panel:#141C3F; --panel2:#1C2652; --line:#2A3670;
@@ -95,24 +90,39 @@
   .tap{font-size:11px;color:var(--mute);font-weight:800;letter-spacing:1px}
   #tip{position:absolute;left:50%;bottom:122px;transform:translateX(-50%);background:rgba(20,28,63,.95);border:2px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap}
   #tip.show{opacity:1}
+  /* home base mode */
+  #bhud{position:absolute;left:0;right:0;top:0;padding:max(10px,env(safe-area-inset-top)) 10px 0;display:none;flex-direction:column;gap:6px;z-index:8}
+  #bhud.on{display:flex}
+  #bhud .res .pill{pointer-events:none}
+  #bhud .pill.rel{gap:7px;font-size:13px;flex:1.4;justify-content:space-around}
+  #btitle{display:flex;align-items:center;gap:8px;background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:5px 8px 5px 10px}
+  #btitle .lab{font-family:var(--display);font-size:13px;color:var(--gold);letter-spacing:.5px;white-space:nowrap}
+  #btitle .h{flex:1;font-size:11px;font-weight:800;color:var(--mute);line-height:1.2}
+  #btitle .btn{padding:7px 9px;font-size:10px;box-shadow:0 3px 0 #9a4d00}
+  #btitle .btn.snd{box-shadow:0 3px 0 #0a0f26}
+  #bq{display:flex;flex-direction:column;gap:4px}
+  #bq .qr{display:flex;align-items:center;gap:8px;background:rgba(20,28,63,.92);border:2px solid var(--line);border-radius:10px;padding:5px 10px;font-size:12px;font-weight:800;cursor:pointer}
+  #bq .qr.idle{color:var(--mute);font-weight:700;cursor:default}
+  #bq .qr .tr{flex:1;height:8px;background:#0a0f26;border-radius:4px;overflow:hidden}
+  #bq .qr .f{height:100%;background:linear-gradient(90deg,var(--laser),var(--cry))}
+  #bq .qr b{font-variant-numeric:tabular-nums;color:var(--gold);white-space:nowrap}
+  #bcard{position:absolute;left:10px;right:10px;bottom:max(12px,env(safe-area-inset-bottom));background:rgba(20,28,63,.97);border:2px solid var(--line);border-radius:14px;padding:10px 12px;display:none;flex-direction:column;gap:6px;font-size:12px;font-weight:700;z-index:9;max-height:62%;overflow:auto}
+  #bcard.show{display:flex}
+  #bcard .hd{display:flex;align-items:center;gap:8px}
+  #bcard .hd b{font-family:var(--display);font-size:13px;color:var(--gold);letter-spacing:.5px}
+  #bcard .hd span{flex:1;color:var(--mute);font-size:10px;letter-spacing:1px}
+  #bcard .x{background:none;border:0;color:var(--mute);font-size:16px;padding:0 4px;cursor:pointer}
+  #bcard .fx{color:var(--ink);line-height:1.35}
+  #bcard .fx.nx{color:var(--gas)}
+  #bcard .ct{color:var(--mute);line-height:1.4}
+  #bcard i{font-style:normal} #bcard i.o{color:var(--ore)} #bcard i.g{color:var(--gas)} #bcard i.c{color:var(--cry)}
+  #bcard .gt{color:var(--bad)} #bcard .gt.on{color:var(--laser)} #bcard .gt.ok{color:var(--gas)}
+  #bcard .sp{display:flex;flex-direction:column;gap:6px;margin:4px 0}
+  #bcard .sp .lab{font-size:10px;letter-spacing:2px;color:var(--mute)}
+  #bcard .sp .btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
+  #bcard .sp .btn small{font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:0;text-transform:none}
+  #bcard .bt{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
   /* overlay screens */
-  #base{position:absolute;inset:0;background:rgba(6,10,30,.94);display:none;align-items:flex-start;justify-content:center;padding:18px 14px;overflow:auto;z-index:40}
-  #base.on{display:flex}
-  #base .bx{width:100%;max-width:520px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 14px 14px;text-align:left}
-  #base h1{font-family:Bungee,sans-serif;font-size:22px;margin:0 0 2px;color:var(--ink)}
-  #base .bank{display:flex;align-items:center;justify-content:space-between;margin:6px 0 12px;color:var(--mute);font-size:12px;font-weight:700}
-  #base .bank b{color:#B36BFF;font-size:18px;font-family:Bungee,sans-serif}
-  #base h2{font-size:11px;letter-spacing:2px;color:var(--mute);margin:14px 0 6px;font-weight:800}
-  #base .row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);margin-bottom:8px}
-  #base .row .n{font-weight:800;font-size:14px;color:var(--ink)}
-  #base .row .w{font-size:10px;color:var(--mute);font-weight:700;letter-spacing:1px;margin-left:6px}
-  #base .row .f{font-size:12px;color:var(--mute);margin-top:2px;line-height:1.3}
-  #base .pips{display:flex;gap:4px;margin-top:6px}
-  #base .pips i{width:22px;height:6px;border-radius:3px;background:#2A3670;display:block}
-  #base .pips i.on{background:#B36BFF;box-shadow:0 0 8px rgba(179,107,255,.6)}
-  #base .row button{min-width:84px}
-  #base .row button.max{opacity:.45}
-  #base p.note{font-size:12px;color:var(--mute);line-height:1.4;margin:10px 0 0}
   #screen{position:absolute;inset:0;background:rgba(6,10,30,.88);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
   #screen .box{max-width:360px;display:flex;flex-direction:column;gap:14px;align-items:center}
   #screen h1{font-family:var(--display);font-size:30px;margin:0;color:var(--gold);line-height:1.05;text-wrap:balance}
@@ -153,7 +163,17 @@
     <button class="btn" id="bSkip">START WAVE</button>
   </div>
   <div id="cards"></div>
-  <div id="base"><div class="bx" id="baseBox"></div></div>
+  <div id="bhud">
+    <div class="res">
+      <div class="pill ore"><span class="ic"></span><span id="bOre">0</span></div>
+      <div class="pill gas"><span class="ic"></span><span id="bGas">0</span></div>
+      <div class="pill cry"><span class="ic"></span><span id="bCry">0</span></div>
+      <div class="pill rel" id="bRel"></div>
+    </div>
+    <div id="btitle"><span class="lab">HOME BASE</span><span class="h" id="bHall">Town Hall Lv 1</span><button class="btn snd" id="bSnd">SOUND</button><button class="btn snd" id="bRen">REN</button><button class="btn" id="bPlay">PLAY</button></div>
+    <div id="bq"></div>
+  </div>
+  <div id="bcard"></div>
   <div id="screen"><div class="box">
     <div class="slide on" data-i="0"><div class="art white"></div><h1>Orbital Holdfast</h1><p>Nobody saw what did it. One night the sky went white without a sound, and when it faded, the world was gone.</p><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn" id="bNext0">NEXT</button><button class="btn alt" id="bBase">HOME BASE</button></div></div>
     <div class="slide" data-i="1"><div class="art island"></div><h1>What's left</h1><p>The hall. A few streets. The hill behind the school. Floating in the dark with the wreck of the planet turning slowly around it.</p><p class="mute">The rocks falling on you are pieces of home. Some of them carry a purple crystal nobody has seen before.</p><button class="btn" id="bNext1">NEXT</button></div>
@@ -177,6 +197,7 @@ const ITEMS = {
   railgun: {nm:"Railgun", ore:400, gas:150, cry:20, dps:120, rng:5.0, rate:1.5, workers:2, col:0xFFD34D, type:"tower", kind:"railgun", needFac:true},
   beam:    {nm:"Crystal Beam", ore:600, gas:250, cry:60, dps:200, rng:4.5, rate:.05, workers:2, col:0xB36BFF, type:"tower", kind:"beam", needFac:true},
   beacon:  {nm:"Beacon", ore:250, gas:0, cry:25, workers:1, col:0x35F0FF, type:"town", beacon:true, ch:2},
+  lab:     {nm:"Research Centre", ore:0, gas:0, workers:2, col:0x35F0FF, type:"eco", hidden:true},
 };
 // tier upgrades (deltas), from the Items sheet. fac = needs Factory
 const UPG = {
@@ -229,24 +250,61 @@ const CHAPTERS=[
 const COMBAT=30, BUILD=8, UPTIME_FLOOR=.5, HUNGER=.4, HERO_WORKERS=2;
 const N=11, HALF=(N-1)/2, B0=1, B1=9; // 11x11 terrain, buildable 9x9 core (1..9)
 // ---------- state ----------
-// ---------- home base (persistent research + town hall) ----------
-let BASE={bank:0,r:{bal:0,mine:0,ren:0,hard:0,log:0},hall:1,runs:0};
-try{const b=JSON.parse(localStorage.getItem("holdfast.base")||"{}");BASE=Object.assign(BASE,b);BASE.r=Object.assign({bal:0,mine:0,ren:0,hard:0,log:0},b.r||{});}catch(e){}
-function saveBase(){try{localStorage.setItem("holdfast.base",JSON.stringify(BASE));}catch(e){}}
-const RESEARCH=[
-  {k:"bal", nm:"Ballistics",     who:"Old Tam", fx:l=>`Tower damage +${10*l}%`,        cost:[12,24,48]},
-  {k:"mine",nm:"Deep Mining",    who:"Dov",     fx:l=>`Ore and gas yield +${12*l}%`,   cost:[12,24,48]},
-  {k:"ren", nm:"Ren's Training", who:"Ren",     fx:l=>`Ren +${20*l}% damage, +${8*l}% speed, +${25*l}% repair`,cost:[10,20,40]},
-  {k:"hard",nm:"Hardening",      who:"Bo",      fx:l=>`Building HP +${20*l}%, hall +${25*l}%`,cost:[12,24,48]},
-  {k:"log", nm:"Logistics",      who:"Asha",    fx:l=>`+${80*l} starting ore, +${2*l}s build time`,cost:[8,16,32]}];
-const HALL_UP=[{cost:30,fx:"Hall +150 HP · +2 housing · +2 food"},{cost:70,fx:"Hall +150 HP · +2 housing · +2 food · one extra free worker"}];
-const RS=BASE.r;const hallLv=BASE.hall;
-const MOD={dmg:1+.10*RS.bal,yield:1+.12*RS.mine,heroDps:1+.20*RS.ren,heroSpd:1+.08*RS.ren,repair:1+.25*RS.ren,hp:1+.20*RS.hard,hallHp:1+.25*RS.hard,ore:80*RS.log,build:2*RS.log,house:2*(hallLv-1),food:2*(hallLv-1),hallBonus:150*(hallLv-1),workers:hallLv>=3?1:0};
+// ---------- home base v2: the island persists between runs ----------
+// 13 upgrade tracks, levels 1–50, real-time timers (crystal to hurry), specialisations at Lv10,
+// hall milestones gate the rest, relics from the fight gate Lv10/25/40/50.
+const RELIC={seam:{nm:"Seam Crystal",ic:"◈",col:"#B36BFF",from:"crystal rocks (and some large rocks)"},core:{nm:"Mothership Core",ic:"●",col:"#35F0FF",from:"the Reclaimer Mothership"},drill:{nm:"Harvester Drill",ic:"▲",col:"#FF3B6B",from:"the Harvester"},lens:{nm:"Reclaimer Lens",ic:"◇",col:"#FFD34D",from:"fighters and reapers"}};
+const permStats=(k,lv,spec)=>k==="shelter"?{house:4+Math.floor(lv/5)+(spec==="Dormitory"?3:0)}:k==="farm"?{food:6+Math.floor(lv/4)+(spec==="Orchard"?4:0)}:k==="mine"?{oreW:Math.round(40*(1+.03*lv)*(spec==="Deep Seam"?1.25:1)),gasW:spec==="Vent Tap"?5:0}:k==="rig"?{gasW:Math.round(25*(1+.03*lv)*(spec==="Pressure"?1.25:1)),oreW:spec==="Cracker"?8:0}:{};
+const TRACKS={
+  hall:   {nm:"Town Hall",       who:"HOLD",  perm:true, key:"hall",    cells:[[5,5,1]], fx:(l,s)=>`Hall ${Math.round(300*(1+.03*l)*(s==="Fortress"?1.5:1))} HP · +${Math.floor(l/2)+(s==="Commune"?3:0)} housing and food · ${(l>=40?3:l>=25?2:l>=10?1:0)+(s==="Commune"?1:0)} free crew${l>=25?" · 3 upgrades at once":""}`, spec:[["Fortress","Hall HP ×1.5 · every building +10% HP"],["Commune","+3 housing · +3 food · +1 free crew"]]},
+  lab:    {nm:"Research Centre", who:"Old Tam",perm:true, key:"lab",    cells:[[3,4,1]], fx:(l,s)=>`Tower XP +${2*l}%${s==="Theory"?" ×1.5":""} · crystal drop chance +${l}%${s==="Extraction"?" · crystal ×1.5":""}`, spec:[["Theory","Tower XP ×1.5"],["Extraction","Crystal drops ×1.5"]]},
+  factory:{nm:"Factory",         who:"Bo",    perm:true, key:"factory", cells:[[7,6,1]], fx:(l,s)=>`All tower damage +${l}%${s==="Munitions"?" +15%":""} · Tier 3 from wave 1${s==="Alloy"?" · buildings +25% HP":""}`, spec:[["Alloy","Every building +25% HP"],["Munitions","All tower damage +15%"]]},
+  shelter:{nm:"Shelter",         who:"Asha",  perm:true, key:"shelter", cells:[[4,3,1],[6,3,15]], fx:(l,s)=>`Houses ${permStats("shelter",l,s).house} each · ${l>=15?"two shelters":"second shelter at Lv15"}${s==="Clinic"?" · injuries heal twice as fast":""}`, spec:[["Dormitory","+3 housing per shelter"],["Clinic","Injured workers recover twice as fast"]]},
+  farm:   {nm:"Farm",            who:"Bo",    perm:true, key:"farm",    cells:[[4,7,1],[6,7,15]], fx:(l,s)=>`Feeds ${permStats("farm",l,s).food} each · ${l>=15?"two farms":"second farm at Lv15"}${s==="Kitchen"?" · hunger penalty halved":""}`, spec:[["Orchard","+4 food per farm"],["Kitchen","Hunger penalty halved"]]},
+  mine:   {nm:"Ore Mine",        who:"Dov",   perm:true, key:"mine",    cells:[[2,3,1],[7,2,10],[8,7,25]], fx:(l,s)=>`${permStats("mine",l,s).oreW} ore/wave each${s==="Vent Tap"?" +5 gas":""} · ${l>=25?"three mines":l>=10?"two mines · third at Lv25":"one mine · second at Lv10"}`, spec:[["Deep Seam","+25% ore per mine"],["Vent Tap","Each mine also taps 5 gas/wave"]]},
+  rig:    {nm:"Gas Rig",         who:"Dov",   perm:true, key:"extract", cells:[[3,8,1],[7,8,20]], fx:(l,s)=>`${permStats("rig",l,s).gasW} gas/wave each${s==="Cracker"?" +8 ore":""} · ${l>=20?"two rigs":"second rig at Lv20"}`, spec:[["Pressure","+25% gas per rig"],["Cracker","Each rig also cracks 8 ore/wave"]]},
+  ren:    {nm:"Ren",             who:"HERO",  hero:true, fx:(l,s)=>`Damage +${2*l}%${s==="Gunner"?" ×1.5":""} · speed +${(l/2).toFixed(1)}% · repair +${2*l}%${s==="Engineer"?" ×2 · base upgrades 15% faster":""}`, spec:[["Engineer","Repair ×2 · base upgrades finish 15% sooner"],["Gunner","Ren's damage ×1.5"]]},
+  cannon: {nm:"Cannon",          who:"TURRET",tower:true,key:"cannon",  cell:[1,5], fx:(l,s)=>`Cannon damage +${2*l}%${s==="Autocannon"?" ×1.3":""} · range +${(l*.01).toFixed(2)}${s==="Siege"?" · shells splash":""}`, spec:[["Siege","Shells splash nearby rocks for half damage"],["Autocannon","Cannon damage ×1.3"]]},
+  laser:  {nm:"Laser",           who:"TURRET",tower:true,key:"laser",   cell:[9,6], fx:(l,s)=>`Laser damage +${2*l}%${s==="Focus"?" ×1.3":""} · range +${(l*.01).toFixed(2)}${s==="Prism"?" · arcs to a second target":""}`, spec:[["Focus","Laser damage ×1.3"],["Prism","Beam arcs to a second target"]]},
+  missile:{nm:"Missile",         who:"TURRET",tower:true,key:"missile", cell:[5,9], fx:(l,s)=>`Missile damage +${2*l}% · range +${(l*.01+(s==="Seeker"?1:0)).toFixed(2)}${s==="Cluster"?" · splash ×1.5":""}`, spec:[["Cluster","Splash radius ×1.5"],["Seeker","Range +1"]]},
+  railgun:{nm:"Railgun",         who:"TURRET",tower:true,key:"railgun", cell:[2,8], lv0:0, hallMin:10, fx:(l,s)=>`Railgun damage +${2*l}%${s==="Pierce"?" ×1.3":""} · range +${(l*.01+(s==="Overcharge"?1.5:0)).toFixed(2)}`, spec:[["Pierce","Railgun damage ×1.3"],["Overcharge","Range +1.5"]]},
+  beam:   {nm:"Crystal Beam",    who:"TURRET",tower:true,key:"beam",    cell:[8,8], lv0:0, hallMin:20, fx:(l,s)=>`Beam damage +${2*l}%${s==="Resonance"?" ×1.3":""} · arcs to ${s==="Lattice"?4:2} others · range +${(l*.01).toFixed(2)}`, spec:[["Lattice","Beam arcs to four others"],["Resonance","Beam damage ×1.3"]]},
+};
+const TRACK_KEYS=Object.keys(TRACKS);
+function newB2(){const tr={};for(const k of TRACK_KEYS)tr[k]={lv:TRACKS[k].lv0===0?0:1,spec:null};return {v:2,ore:0,gas:0,cry:0,relics:{seam:0,core:0,drill:0,lens:0},runs:0,tr,q:[],last:Date.now()};}
+let B2=null;
+try{const raw=localStorage.getItem("holdfast.base2");if(raw){const b=JSON.parse(raw);B2=Object.assign(newB2(),b);B2.relics=Object.assign({seam:0,core:0,drill:0,lens:0},b.relics||{});const tr=newB2().tr;for(const k in tr)tr[k]=Object.assign(tr[k],(b.tr||{})[k]||{});B2.tr=tr;B2.q=Array.isArray(b.q)?b.q.filter(e=>TRACKS[e.k]):[];}}catch(e){B2=null;}
+if(!B2){B2=newB2();try{const o=JSON.parse(localStorage.getItem("holdfast.base")||"null");if(o){const r=o.r||{};const cap=v=>Math.max(1,Math.min(50,v));B2.cry=o.bank||0;B2.runs=o.runs||0;B2.tr.hall.lv=cap(1+((o.hall||1)-1)*3+(r.log||0)*2);B2.tr.factory.lv=cap(1+(r.bal||0)*3);B2.tr.mine.lv=cap(1+(r.mine||0)*3);B2.tr.ren.lv=cap(1+(r.ren||0)*3);B2.tr.shelter.lv=cap(1+(r.hard||0)*3);}}catch(e){}}
+function saveB2(){B2.last=Date.now();try{localStorage.setItem("holdfast.base2",JSON.stringify(B2));}catch(e){}}
+const LV=k=>B2.tr[k].lv, SPEC=k=>B2.tr[k].spec;
+function upCost(k){const L=Math.max(1,LV(k)),T=LV(k)+1,m=TRACKS[k].tower?.7:1;const c={ore:Math.round(50*Math.pow(L,1.55)*m),gas:L>=3?Math.round(12*Math.pow(L,1.5)*m):0,cry:L%5===0?L*2:0,relics:{}};
+  if(T===10)c.relics.seam=1;if(T===25)c.relics[TRACKS[k].tower?"drill":"core"]=1;if(T===40)c.relics.lens=2;if(T===50){c.relics.seam=1;c.relics.core=1;c.relics.drill=1;c.relics.lens=1;}return c;}
+function upTime(k){const L=Math.max(1,LV(k));return Math.max(5,Math.round(8*Math.pow(L,2.15)*(1-.004*LV("hall"))*(SPEC("ren")==="Engineer"?.85:1)));}
+const maxQ=()=>LV("hall")>=25?3:2;
+function gate(k){const L=LV(k),T=L+1;if(L>=50)return "Fully upgraded";const t=TRACKS[k];
+  if(k==="hall"){const need=T===10?[["lab",5],["factory",5]]:T===20?[["mine",15],["shelter",15]]:T===30?[["tower",20]]:T===40?[["relic","core"],["relic","drill"]]:T===50?TRACK_KEYS.filter(x=>x!=="hall"&&!TRACKS[x].tower).map(x=>[x,45]):null;
+    if(need)for(const [x,v] of need){if(x==="tower"){if(!TRACK_KEYS.some(y=>TRACKS[y].tower&&LV(y)>=v))return `Hall Lv${T} needs any turret at Lv${v}`;}else if(x==="relic"){if(B2.relics[v]<1)return `Hall Lv${T} needs a ${RELIC[v].nm} (from ${RELIC[v].from})`;}else if(LV(x)<v)return `Hall Lv${T} needs ${TRACKS[x].nm} Lv${v}`;}}
+  else{if(t.hallMin&&LV("hall")<t.hallMin)return `Unlocks at Town Hall Lv${t.hallMin}`;if(LV("hall")<T-2)return `Lv${T} needs Town Hall Lv${T-2}`;}
+  return null;}
+function why(k){const g=gate(k);if(g)return g;if(B2.q.some(e=>e.k===k))return "Upgrading";if(B2.q.length>=maxQ())return `Crews busy — ${maxQ()} upgrades at a time`;const c=upCost(k);if(B2.ore<c.ore)return `Need ${c.ore} ore (bank ore by finishing runs)`;if(B2.gas<c.gas)return `Need ${c.gas} gas`;if(B2.cry<c.cry)return `Need ${c.cry} crystal`;for(const r in c.relics)if(B2.relics[r]<c.relics[r])return `Need ${c.relics[r]} ${RELIC[r].nm}${c.relics[r]>1?"es":""} — drops from ${RELIC[r].from}`;return null;}
+function startUp(k){const w=why(k);if(w)return w;const c=upCost(k);B2.ore-=c.ore;B2.gas-=c.gas;B2.cry-=c.cry;for(const r in c.relics)B2.relics[r]-=c.relics[r];const d=upTime(k);B2.q.push({k,end:Date.now()+d*1000,dur:d});saveB2();return null;}
+const hurryCost=e=>Math.max(1,Math.ceil((e.end-Date.now())/1000/600));
+function hurry(k){const e=B2.q.find(x=>x.k===k);if(!e)return "Nothing to hurry";const c=hurryCost(e);if(B2.cry<c)return `Need ${c} crystal`;B2.cry-=c;e.end=Date.now();finishQ();return null;}
+function finishQ(){const now=Date.now();const done=[];for(const e of [...B2.q]){if(e.end<=now){B2.tr[e.k].lv=Math.min(50,B2.tr[e.k].lv+1);B2.q=B2.q.filter(x=>x!==e);done.push(e.k);}}if(done.length)saveB2();return done;}
+function setSpec(k,name){const t=TRACKS[k];if(!t.spec)return "No specialisation";if(LV(k)<10)return "Specialise at Lv10";if(SPEC(k))return "Already specialised";if(!t.spec.some(s=>s[0]===name))return "Unknown specialisation";B2.tr[k].spec=name;saveB2();return null;}
+finishQ(); // anything that finished while the app was closed
+function buildMOD(){const H=LV("hall"),hs=SPEC("hall"),fs=SPEC("factory"),rs=SPEC("ren"),ls=SPEC("lab");const kind={};
+  for(const k of ["cannon","laser","missile","railgun","beam"]){const l=LV(k),s=SPEC(k);kind[k]={dmg:(1+.02*l)*(["Autocannon","Focus","Pierce","Resonance"].includes(s)?1.3:1),rng:.01*l+(s==="Seeker"?1:s==="Overcharge"?1.5:0),splash:s==="Cluster"?1.5:1,siege:s==="Siege",chain:s==="Prism"?1:s==="Lattice"?4:k==="beam"?2:0};}
+  return {dmg:(1+.01*LV("factory"))*(fs==="Munitions"?1.15:1),heroDps:(1+.02*LV("ren"))*(rs==="Gunner"?1.5:1),heroSpd:1+.005*LV("ren"),repair:(1+.02*LV("ren"))*(rs==="Engineer"?2:1),
+    hp:(fs==="Alloy"?1.25:1)*(hs==="Fortress"?1.1:1),hallHp:(1+.03*H)*(hs==="Fortress"?1.5:1),house:Math.floor(H/2)+(hs==="Commune"?3:0),food:Math.floor(H/2)+(hs==="Commune"?3:0),workers:(H>=40?3:H>=25?2:H>=10?1:0)+(hs==="Commune"?1:0),
+    xp:(1+.02*LV("lab"))*(ls==="Theory"?1.5:1),cryP:.01*LV("lab"),cryMult:ls==="Extraction"?1.5:1,hunger:SPEC("farm")==="Kitchen"?.5:1,heal:SPEC("shelter")==="Clinic"?2:1,build:0,kind};}
+const MOD=buildMOD();
+const BASEMODE=(()=>{try{const m=localStorage.getItem("holdfast.mode")==="base";localStorage.removeItem("holdfast.mode");return m;}catch(e){return false;}})();
 let SAVE={};try{SAVE=JSON.parse(localStorage.getItem("holdfast.save")||"{}");}catch(e){SAVE={};}
 let startCh=1;try{startCh=+(localStorage.getItem("holdfast.start")||1);localStorage.removeItem("holdfast.start");}catch(e){}
 if(startCh===2&&!SAVE.ch2)startCh=1;
 const CH=CHAPTERS[startCh-1];const CW=()=>CH.waves;
-const S = {ch:CH.n,ore:CH.ore+MOD.ore,gas:CH.gas,cry:startCh===2?Math.min(30,(SAVE.cry||0)):0,pop:CH.pop,house:CH.house+MOD.house,food:CH.food+MOD.food,wave:0,phase:"build",t:0,started:false,over:false,injured:[],rep:0,neighbour:null,dovDone:false,
+const S = {ch:CH.n,baseMode:BASEMODE,ore:CH.ore,gas:CH.gas,cry:startCh===2?Math.min(30,(SAVE.cry||0)):0,pop:CH.pop,house:CH.house+MOD.house,food:CH.food+MOD.food,wave:0,phase:"build",t:0,started:false,over:false,injured:[],rep:0,neighbour:null,dovDone:false,
   buildings:[],enemies:[],shots:[],loot:[],pods:[],hero:null,sel:null,combo:0,comboT:0,rallyT:0,rallyCd:0,
   staff:1,fed:1,out:1,kills:0,rescued:0,lost:0,heroXP:0,heroLv:startCh===2?Math.max(1,(SAVE.heroLv||1)):1,spawnQ:[],waveDone:false,speed:1};
 function saveGame(extra){try{const cur=JSON.parse(localStorage.getItem("holdfast.save")||"{}");localStorage.setItem("holdfast.save",JSON.stringify(Object.assign(cur,extra)));}catch(e){}}
@@ -316,7 +374,7 @@ const falls=[];for(const [x,z] of [[10,3.5],[0,6],[4,10]]){const g=new THREE.Gro
   const off=x===0?[-.6,0]:x===N-1?[.6,0]:[0,.6];g.position.set(x-HALF+off[0],x===N-1?-.45:0,z-HALF+off[1]);world.add(g);falls.push(g);}
 // town hall
 {const h=new THREE.Group();const b1=new THREE.Mesh(new THREE.BoxGeometry(.9,.8,.9),M.hall);b1.position.y=.9;h.add(b1);const roof=new THREE.Mesh(new THREE.BoxGeometry(.7,.4,.7),mat(0x8B93B5));roof.position.y=1.5;h.add(roof);const win=new THREE.Mesh(new THREE.BoxGeometry(.3,.25,.05),new THREE.MeshBasicMaterial({color:0xFFD34D}));win.position.set(0,.95,.46);h.add(win);const mast=new THREE.Mesh(new THREE.BoxGeometry(.06,.6,.06),mat(0x8B93B5));mast.position.set(.3,1.9,.3);h.add(mast);const dish=new THREE.Mesh(new THREE.BoxGeometry(.32,.18,.05),mat(0xE3DDD0));dish.position.set(.3,2.2,.3);h.add(dish);h.userData.dish=dish;const flag=new THREE.Mesh(new THREE.BoxGeometry(.3,.2,.03),mat(0xF28C28));flag.position.set(-.3,1.95,-.3);h.add(flag);const pole=new THREE.Mesh(new THREE.BoxGeometry(.04,.7,.04),mat(0x5E4634));pole.position.set(-.45,1.75,-.3);h.add(pole);h.position.set(0,0,0);world.add(h);
- const hc=cellAt(5,5);hc.b={key:"hall",hp:Math.round((300+MOD.hallBonus)*MOD.hallHp),maxhp:Math.round((300+MOD.hallBonus)*MOD.hallHp),mesh:h,it:{nm:"Town Hall",workers:0}};S.hall=hc.b;addBar(hc.b);}
+ const hc=cellAt(5,5);hc.b={key:"hall",hp:Math.round(300*MOD.hallHp),maxhp:Math.round(300*MOD.hallHp),mesh:h,it:{nm:"Town Hall",workers:0},cell:hc};S.hall=hc.b;addBar(hc.b);}
 // threat reticle: one red ring on the cell the next asteroid will hit
 const reticle=new THREE.Mesh(new THREE.TorusGeometry(.42,.06,8,24),new THREE.MeshBasicMaterial({color:0xFF5A5A}));reticle.rotation.x=Math.PI/2;reticle.position.y=.53;reticle.visible=false;world.add(reticle);
 const retInner=new THREE.Mesh(new THREE.TorusGeometry(.18,.04,8,16),new THREE.MeshBasicMaterial({color:0xFF5A5A}));retInner.rotation.x=Math.PI/2;retInner.position.y=.54;retInner.visible=false;world.add(retInner);
@@ -432,12 +490,12 @@ function popText(localPos,txt,cls){const v=localPos.clone();v.y+=1;v.applyMatrix
 let tipT=0;function tip(t){$("tip").textContent=t;$("tip").classList.add("show");tipT=2.2;}
 function say(t){$("holdTxt").textContent=t;$("hold").classList.add("show");}
 // ---------- economy ----------
-function workersNeeded(){let w=0;for(const b of S.buildings)w+=b.it.workers||0;return w;}
+function workersNeeded(){let w=0;for(const b of S.buildings)w+=b.workers||0;return w;}
 function recalc(){
   const need=workersNeeded();const avail=Math.max(0,S.pop-S.injured.length)+HERO_WORKERS+MOD.workers;
   S.staff=need===0?1:Math.min(1,avail/need);
   S.fed=S.pop===0?1:Math.min(1,S.food/S.pop);
-  const morale=1-HUNGER*(1-S.fed);
+  const morale=1-HUNGER*MOD.hunger*(1-S.fed);
   S.out=(UPTIME_FLOOR+(1-UPTIME_FLOOR)*S.staff)*morale*(S.rallyT>0?1.3:1);
 }
 function income(){let ore=0,gas=0;const fac=(hasFactory()?1.2:1)*MOD.yield;for(const b of S.buildings){const boost=(S.hero.post===b)?1.5:1;if(b.oreW)ore+=b.oreW*S.out*boost*fac;if(b.gasW)gas+=b.gasW*S.out*boost*fac;}
@@ -457,13 +515,16 @@ function makeMesh(key){const it=ITEMS[key];const g=new THREE.Group();
   else if(key==="shelter"){const h=new THREE.Mesh(new THREE.BoxGeometry(.7,.5,.6),mat(it.col));h.position.y=.75;g.add(h);const r=new THREE.Mesh(new THREE.BoxGeometry(.8,.2,.7),mat(0xE5484D));r.position.y=1.1;g.add(r);}
   else if(key==="beacon"){const p=new THREE.Mesh(new THREE.BoxGeometry(.2,1.4,.2),mat(0x8B93B5));p.position.y=1.2;g.add(p);const l=new THREE.Mesh(new THREE.OctahedronGeometry(.22,0),new THREE.MeshBasicMaterial({color:it.col}));l.position.y=2.0;g.add(l);g.userData.spin=l;const ring=new THREE.Mesh(new THREE.TorusGeometry(.45,.05,6,20),new THREE.MeshBasicMaterial({color:it.col}));ring.rotation.x=Math.PI/2;ring.position.y=.56;g.add(ring);}
   else if(key==="factory"){const h=new THREE.Mesh(new THREE.BoxGeometry(.85,.55,.85),mat(it.col));h.position.y=.77;g.add(h);const ch=new THREE.Mesh(new THREE.BoxGeometry(.18,.6,.18),mat(0x5E4634));ch.position.set(.28,1.2,-.25);g.add(ch);const gear=new THREE.Mesh(new THREE.BoxGeometry(.3,.3,.08),mat(0xF28C28));gear.position.set(-.2,1.15,.44);g.add(gear);g.userData.spin=gear;}
+  else if(key==="lab"){const h=new THREE.Mesh(new THREE.BoxGeometry(.75,.5,.75),mat(0x2E3A5C));h.position.y=.75;g.add(h);const dome=new THREE.Mesh(new THREE.OctahedronGeometry(.28,0),new THREE.MeshBasicMaterial({color:it.col}));dome.position.y=1.25;g.add(dome);g.userData.spin=dome;g.add(voxel(mat(0x8B93B5),.28,1.35,-.25,.05,.6,.05,false));}
   else if(key==="farm"){const h=new THREE.Mesh(new THREE.BoxGeometry(.8,.25,.8),mat(0x5B3A1E));h.position.y=.62;g.add(h);for(let i=0;i<4;i++){const c=new THREE.Mesh(new THREE.BoxGeometry(.14,.3,.7),mat(it.col));c.position.set(-.3+i*.2,.85,0);g.add(c);}}
   return g;}
 function addBar(b){const g=new THREE.Group();const bg=new THREE.Mesh(new THREE.BoxGeometry(.8,.1,.02),new THREE.MeshBasicMaterial({color:0x0a0f26}));const fg=new THREE.Mesh(new THREE.BoxGeometry(.76,.07,.03),new THREE.MeshBasicMaterial({color:0x58D68D}));fg.position.z=.01;g.add(bg);g.add(fg);g.position.y=b.key==="hall"?2.0:1.7;g.visible=false;b.mesh.add(g);b.bar=g;b.barFill=fg;}
 function updateBar(b){if(!b.bar)return;const f=Math.max(0,b.hp/b.maxhp);b.bar.visible=f<1;b.barFill.scale.x=Math.max(.02,f);b.barFill.position.x=-(1-f)*.38;b.barFill.material.color.setHex(f>.6?0x58D68D:f>.3?0xFFD34D:0xFF5A5A);b.bar.quaternion.copy(world.quaternion).invert().multiply(cam.quaternion);}
-function place(key,cell){const it=ITEMS[key];S.ore-=it.ore;S.gas-=it.gas;if(cell.deco){world.remove(cell.deco);cell.deco=null;}const mesh=makeMesh(key);mesh.position.set(cell.x-HALF,cell.h,cell.z-HALF);mesh.traverse(o=>{if(o.isMesh)o.castShadow=true;});world.add(mesh);
-  S.cry-=(it.cry||0);
-  const b={key,it,cell,mesh,hp:Math.round(100*MOD.hp),maxhp:Math.round(100*MOD.hp),cd:0,xp:0,lv:1,tier:1,pips:[],dps:it.dps||0,rng:it.rng||0,oreW:it.oreW||0,gasW:it.gasW||0};cell.b=b;S.buildings.push(b);addBar(b);if(it.house)S.house+=it.house;if(it.food)S.food+=it.food;recalc();tip(it.nm+" built");sfx.build();if(it.factory){popText(mesh.position,"FACTORY ONLINE — Tier 3 unlocked","combo");updateCards();}if(it.beacon){summonNeighbour();}}
+function place(key,cell,perm){const it=ITEMS[key];if(!perm){S.ore-=it.ore;S.gas-=it.gas;S.cry-=(it.cry||0);}if(cell.deco){world.remove(cell.deco);cell.deco=null;}const mesh=makeMesh(key);mesh.position.set(cell.x-HALF,cell.h,cell.z-HALF);mesh.traverse(o=>{if(o.isMesh)o.castShadow=true;});world.add(mesh);
+  const hpm=100*MOD.hp*(perm?1+.02*perm.lv:1);const km=MOD.kind[it.kind]||{};
+  const b={key,it,cell,mesh,hp:Math.round(hpm),maxhp:Math.round(hpm),cd:0,xp:0,lv:1,tier:1,pips:[],dps:it.dps||0,rng:(it.rng||0)+(km.rng||0),oreW:it.oreW||0,gasW:it.gasW||0,house:it.house||0,food:it.food||0,workers:it.workers||0};
+  if(perm){b.perm=true;b.track=perm.k;b.plv=perm.lv;Object.assign(b,permStats(perm.k,perm.lv,perm.spec));b.workers=Math.ceil((it.workers||0)/2);levelRings(mesh,perm.lv);}
+  cell.b=b;S.buildings.push(b);addBar(b);if(b.house)S.house+=b.house;if(b.food)S.food+=b.food;recalc();if(!perm){tip(it.nm+" built");sfx.build();if(it.factory){popText(mesh.position,"FACTORY ONLINE — Tier 3 unlocked","combo");updateCards();}if(it.beacon){summonNeighbour();}}}
 // ---------- neighbour island (Chapter 2) ----------
 function summonNeighbour(){if(S.neighbour)return;const g=new THREE.Group();const ox=11,oz=-3;
   for(let x=-1;x<=1;x++)for(let z=-1;z<=1;z++){if(Math.abs(x)+Math.abs(z)>1.5&&Math.random()<.5)continue;const top=new THREE.Mesh(box,(x+z)%2?M.grass:M.grass2);top.position.set(x,0,z);top.add(new THREE.LineSegments(boxEdges,edgeMat));g.add(top);const d=new THREE.Mesh(box,M.dirt);d.position.set(x,-1,z);g.add(d);const st=new THREE.Mesh(box,M.stone);st.position.set(x,-2,z);st.scale.set(.96,1,.96);g.add(st);}
@@ -492,15 +553,15 @@ function tryUpgrade(b){const u=upgradeCost(b);if(!u){tip("Max tier");return;}if(
   const ring=new THREE.Mesh(new THREE.BoxGeometry(.7,.08,.7),new THREE.MeshBasicMaterial({color:b.tier===2?0xC0C8D8:0xFFD34D}));ring.position.y=.5+(b.tier-2)*.1;b.mesh.add(ring);
   popText(b.mesh.position,b.it.nm+" → T"+b.tier,"combo");sfx.upgrade();showPanel(b);updateCards();}
 function showPanel(b){S.selB=b;const p=$("panel");if(!b||b.key==="hall"){p.classList.remove("show");return;}
-  const u=upgradeCost(b);$("pName").textContent=b.it.nm+" T"+b.tier+(b.it.type==="tower"?" · Lv"+b.lv:"");
+  const u=upgradeCost(b);$("pName").textContent=b.it.nm+" T"+b.tier+(b.it.type==="tower"?" · Lv"+b.lv:"")+(b.perm?" · BASE LV"+b.plv:"");
   const st=b.it.type==="tower"?`<b>${Math.round(b.dps*MOD.dmg*lvMult(b))}</b> DPS · <b>${Math.round(b.hp)}</b>/${b.maxhp} HP`:b.oreW?`<b>${b.oreW}</b> ore/wave · <b>${Math.round(b.hp)}</b> HP`:b.gasW?`<b>${b.gasW}</b> gas/wave · <b>${Math.round(b.hp)}</b> HP`:`<b>${Math.round(b.hp)}</b>/${b.maxhp} HP`;
   $("pStat").innerHTML=st;const btn=$("pUp");if(u){btn.style.display="";btn.textContent=`T${b.tier+1}: ${u.ore}${u.gas?" +"+u.gas+"g":""}${u.cry?" +"+u.cry+"c":""}${u.fac&&!hasFactory()?" (Factory)":""}`;btn.disabled=(u.fac&&!hasFactory())||S.ore<u.ore||S.gas<u.gas||S.cry<u.cry;}else{btn.style.display="none";}
   p.classList.add("show");}
 $("pUp").addEventListener("click",()=>{if(S.selB)tryUpgrade(S.selB);});
-function destroyBuilding(b){world.remove(b.mesh);b.cell.b=null;S.buildings=S.buildings.filter(x=>x!==b);if(b.it.house){S.house-=b.it.house;if(S.pop>S.house){S.lost+=S.pop-S.house;S.pop=S.house;}}if(b.it.food)S.food-=b.it.food;if(S.hero.post===b)S.hero.post=null;recalc();}
+function destroyBuilding(b){world.remove(b.mesh);b.cell.b=null;S.buildings=S.buildings.filter(x=>x!==b);if(b.house){S.house-=b.house;if(S.pop>S.house){S.lost+=S.pop-S.house;S.pop=S.house;}}if(b.food)S.food-=b.food;if(S.hero.post===b)S.hero.post=null;recalc();}
 // ---------- cards ----------
 const cardEls={};
-for(const key of Object.keys(ITEMS)){const it=ITEMS[key];if(it.ch&&it.ch!==S.ch)continue;const el=document.createElement("button");el.className="card";el.innerHTML=`<div class="sw" style="background:#${it.col.toString(16).padStart(6,'0')}"></div><div class="nm">${it.nm}</div><div class="cost">${it.ore}${it.gas?` <i>+${it.gas}</i>`:""}${it.cry?` <i class="c">+${it.cry}</i>`:""}</div>${it.needFac||it.factory?'<div class="lk"></div>':''}`;
+for(const key of Object.keys(ITEMS)){const it=ITEMS[key];if(it.hidden||(it.ch&&it.ch!==S.ch))continue;const el=document.createElement("button");el.className="card";el.innerHTML=`<div class="sw" style="background:#${it.col.toString(16).padStart(6,'0')}"></div><div class="nm">${it.nm}</div><div class="cost">${it.ore}${it.gas?` <i>+${it.gas}</i>`:""}${it.cry?` <i class="c">+${it.cry}</i>`:""}</div>${it.needFac||it.factory?'<div class="lk"></div>':''}`;
   el.addEventListener("click",()=>{sfx.click();showPanel(null);if(S.sel===key){S.sel=null;}else{S.sel=key;tip(it.type==="tower"?`Tap a cell to place. ${it.dps} DPS, ${it.workers} crew`:it.factory?`Unlocks Tier 3, Railgun and Beam; +20% mine output. Needs 3 workers.`:it.need?`Tap a ${it.need==="vein"?"orange vein":"green vent"}. Needs ${it.workers} workers`:it.house?`Houses ${it.house}. Tap a cell.`:`Feeds ${it.food}. Needs 1 worker. Tap a cell.`);}updateCards();});
   $("cards").appendChild(el);cardEls[key]=el;}
 function updateCards(){const fac=hasFactory();for(const k in cardEls){const it=ITEMS[k];const locked=(it.needFac&&!fac)||(it.factory&&fac);cardEls[k].classList.toggle("sel",S.sel===k);cardEls[k].classList.toggle("lock",!!locked);cardEls[k].classList.toggle("no",!locked&&(S.ore<it.ore||S.gas<it.gas||(it.cry||0)>S.cry));const lk=cardEls[k].querySelector(".lk");if(lk)lk.textContent=it.factory?(fac?"BUILT":"UNLOCKS T3"):(fac?"":"NEEDS FACTORY");}}
@@ -510,7 +571,7 @@ cvs.addEventListener("pointerdown",e=>{downAt=[e.clientX,e.clientY];lastX=e.clie
 let lastY=0;S.camPitch=0.95;
 cvs.addEventListener("pointermove",e=>{if(!downAt)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;if(Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1])>12)dragged=true;if(dragged){S.camAngle-=dx*0.005;S.camVel=-dx*0.005;S.camPitch=Math.max(0.35,Math.min(1.35,S.camPitch+dy*0.004));placeCam();}});
 cvs.addEventListener("pointercancel",()=>{downAt=null;});
-cvs.addEventListener("pointerup",e=>{if(!downAt||S.over||!S.started){downAt=null;return;}const d=Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1]);downAt=null;if(d>12||dragged)return;
+cvs.addEventListener("pointerup",e=>{if(S.baseMode){basePointer(e);return;}if(!downAt||S.over||!S.started){downAt=null;return;}const d=Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1]);downAt=null;if(d>12||dragged)return;
   ptr.x=(e.clientX/innerWidth)*2-1;ptr.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(ptr,cam);
   if(!S.sel&&S.enemies.length){const eh=ray.intersectObjects(S.enemies.map(x=>x.mesh),true);if(eh.length){let o=eh[0].object;while(o&&!S.enemies.some(x=>x.mesh===o))o=o.parent;const en=S.enemies.find(x=>x.mesh===o);if(en){S.hero.target=en;S.hero.goPost=null;S.hero.post=null;S.hero.tx=Math.max(-HALF,Math.min(HALF,en.tx));S.hero.tz=Math.max(-HALF,Math.min(HALF,en.tz));tip("Ren targeting the "+(en.boss?"mothership":en.k==="fighter"?"fighter":en.k+" asteroid"));popText(en.mesh.position,"TARGET","bad");return;}}}
   const hits=ray.intersectObjects(cellMesh,false);if(!hits.length){return;}
@@ -523,20 +584,55 @@ cvs.addEventListener("pointerup",e=>{if(!downAt||S.over||!S.started){downAt=null
 $("bSkip").addEventListener("click",()=>{sfx.click();if(S.phase==="build")startCombat();else if(S.phase==="combat"&&!S.enemies.length&&!S.spawnQ.length)endWave();});
 $("bSpeed").addEventListener("click",()=>{sfx.click();S.speed=S.speed>=3?1:S.speed+1;$("bSpeed").textContent=S.speed+"×";$("bSpeed").classList.toggle("on",S.speed>1);tip(S.speed>1?"Fast forward "+S.speed+"×":"Normal speed");});
 $("bRally").addEventListener("click",()=>{if(S.rallyCd>0)return;S.rallyT=COMBAT;S.rallyCd=120;recalc();tip("RALLY — everyone works +30% this wave");popText(S.hero.mesh.position,"RALLY!","combo");});
-// ---------- home base screen ----------
-function bankRun(won){const gain=Math.max(0,Math.floor((S.cry+Math.floor(S.kills/8))*(won?1:.5)));BASE.bank+=gain;BASE.runs++;S.banked=gain;saveBase();}
-function renderBase(){const box=$("baseBox");const rows=RESEARCH.map(r=>{const lv=BASE.r[r.k]||0,max=lv>=3,cost=max?0:r.cost[lv],can=!max&&BASE.bank>=cost;
-    return `<div class="row"><div><div class="n">${r.nm}<span class="w">${r.who.toUpperCase()}</span></div><div class="f">${lv?"Now: "+r.fx(lv)+"<br>":""}${max?"Fully researched":"Next: "+r.fx(lv+1)}</div><div class="pips">${[1,2,3].map(i=>`<i class="${i<=lv?"on":""}"></i>`).join("")}</div></div><button class="btn ${max?"max":can?"":"snd"}" data-r="${r.k}" ${max||!can?"disabled":""}>${max?"MAX":cost+" ◆"}</button></div>`;}).join("");
-  const hl=BASE.hall,hmax=hl>=3,hcost=hmax?0:HALL_UP[hl-1].cost,hcan=!hmax&&BASE.bank>=hcost;
-  const hall=`<div class="row"><div><div class="n">Town Hall<span class="w">LEVEL ${hl}</span></div><div class="f">${hl>1?"Now: "+HALL_UP[hl-2].fx+"<br>":""}${hmax?"Fully rebuilt":"Next: "+HALL_UP[hl-1].fx}</div><div class="pips">${[1,2,3].map(i=>`<i class="${i<=hl?"on":""}"></i>`).join("")}</div></div><button class="btn ${hmax?"max":hcan?"":"snd"}" data-h="1" ${hmax||!hcan?"disabled":""}>${hmax?"MAX":hcost+" ◆"}</button></div>`;
-  box.innerHTML=`<h1>Home Base</h1><div class="bank"><span>Crystal banked from ${BASE.runs} run${BASE.runs===1?"":"s"}</span><b>${BASE.bank} ◆</b></div><h2>RESEARCH</h2>${rows}<h2>BASE</h2>${hall}<p class="note">Crystal you finish a run with is banked here (half if the hall falls). Research and hall upgrades are permanent and apply to every chapter from the next run.</p><div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end"><button class="btn" id="bBaseBack">BACK</button></div>`;
-  box.querySelectorAll("button[data-r]").forEach(b=>b.addEventListener("click",()=>{const r=RESEARCH.find(x=>x.k===b.dataset.r);const lv=BASE.r[r.k]||0;if(lv>=3)return;const cost=r.cost[lv];if(BASE.bank<cost){sfx.deny();return;}BASE.bank-=cost;BASE.r[r.k]=lv+1;saveBase();sfx.upgrade();renderBase();}));
-  const hb=box.querySelector("button[data-h]");if(hb)hb.addEventListener("click",()=>{if(BASE.hall>=3)return;const cost=HALL_UP[BASE.hall-1].cost;if(BASE.bank<cost){sfx.deny();return;}BASE.bank-=cost;BASE.hall++;saveBase();sfx.level();renderBase();});
-  $("bBaseBack").addEventListener("click",()=>{sfx.click();$("base").classList.remove("on");if(baseDirty()){tip("Upgrades apply from the next run");}});}
-let baseSnap=JSON.stringify(BASE);function baseDirty(){return JSON.stringify(BASE)!==baseSnap;}
-function openBase(){sfx.unlock();sfx.click();renderBase();$("base").classList.add("on");}
-window.__openBase=openBase;window.__BASE=BASE;
-$("bBase").addEventListener("click",openBase);
+// ---------- home base mode: the island itself, between runs ----------
+function bankRun(won){const m=won?1:.5;const o=Math.max(0,Math.floor(S.ore*m)),g=Math.max(0,Math.floor(S.gas*m)),c=Math.max(0,Math.floor((S.cry+Math.floor(S.kills/8))*m));B2.ore+=o;B2.gas+=g;B2.cry+=c;B2.runs++;S.banked={o,g,c};saveB2();}
+function goBase(){try{localStorage.setItem("holdfast.mode","base");}catch(e){}location.reload();}
+function goPlay(){try{localStorage.removeItem("holdfast.mode");localStorage.removeItem("holdfast.start");}catch(e){}location.reload();}
+window.__openBase=goBase;window.__B2=B2;
+$("bBase").addEventListener("click",()=>{sfx.click();goBase();});
+const fmtT=s=>s<60?Math.max(0,Math.ceil(s))+"s":s<3600?Math.floor(s/60)+"m "+Math.floor(s%60)+"s":Math.floor(s/3600)+"h "+Math.floor(s%3600/60)+"m";
+const fmtCost=c=>{const p=[];if(c.ore)p.push(`<i class="o">${c.ore} ore</i>`);if(c.gas)p.push(`<i class="g">${c.gas} gas</i>`);if(c.cry)p.push(`<i class="c">${c.cry} ◆</i>`);for(const r in c.relics)p.push(`<i style="color:${RELIC[r].col}">${c.relics[r]} ${RELIC[r].ic} ${RELIC[r].nm}</i>`);return p.join(" · ")||"free";};
+let bSel=null;
+function levelRings(mesh,lv){for(const [th,col,y] of [[10,0xC0C8D8,.5],[25,0xFFD34D,.58],[40,0xB36BFF,.66]]){if(lv>=th){const ring=new THREE.Mesh(new THREE.BoxGeometry(.72,.06,.72),new THREE.MeshBasicMaterial({color:col}));ring.position.y=y;mesh.add(ring);}}}
+function placePermanent(base,only){for(const k of TRACK_KEYS){if(only&&k!==only)continue;const t=TRACKS[k];const lv=LV(k),spec=SPEC(k);
+  if(t.perm&&k!=="hall"){for(const [x,z,at] of t.cells){if(lv<at)continue;const c=cellAt(x,z);if(!c||c.b)continue;place(t.key,c,{k,lv,spec});}}
+  else if(t.tower&&base){const c=cellAt(t.cell[0],t.cell[1]);if(!c||c.b)continue;if(lv>0){place(k,c,{k,lv,spec});}else{const g=voxel(mat(0x2a2f45),0,.55,0,.7,.1,.7);g.position.set(c.x-HALF,c.h,c.z-HALF);world.add(g);c.b={key:k,it:ITEMS[k],mesh:g,cell:c,track:k,locked:true,hp:1,maxhp:1};}}}
+  S.hall.track="hall";if(!S.hall.rings){S.hall.rings=true;levelRings(S.hall.mesh,LV("hall"));}}
+function refreshTrack(k){const t=TRACKS[k];if(k==="hall"){levelRings(S.hall.mesh,LV("hall"));return;}if(!t.perm&&!t.tower)return;
+  for(const c of cells){if(c.b&&c.b.track===k){world.remove(c.b.mesh);if(c.b.house)S.house-=c.b.house;if(c.b.food)S.food-=c.b.food;S.buildings=S.buildings.filter(x=>x!==c.b);c.b=null;}}
+  placePermanent(true,k);recalc();}
+function applyDone(keys){for(const k of keys){refreshTrack(k);const t=TRACKS[k];const c=t.cells?cellAt(t.cells[0][0],t.cells[0][1]):t.cell?cellAt(t.cell[0],t.cell[1]):null;popText(c?new THREE.Vector3(c.x-HALF,c.h,c.z-HALF):S.hero.mesh.position,t.nm+" → Lv"+LV(k),"combo");}if(keys.length)sfx.level();}
+function trackFx(k,l){const t=TRACKS[k];return l<=0?"Not built yet — first upgrade builds it":t.fx(l,SPEC(k));}
+function renderCard(){const el=$("bcard");if(!bSel){el.classList.remove("show");return;}const k=bSel,t=TRACKS[k],lv=LV(k),sp=SPEC(k),q=B2.q.find(e=>e.k===k);const w=why(k);const c=upCost(k);
+  const specHtml=(t.spec&&lv>=10&&!sp)?`<div class="sp"><div class="lab">CHOOSE A SPECIALISATION — permanent</div>${t.spec.map(s=>`<button class="btn alt" data-spec="${s[0]}">${s[0].toUpperCase()}<small>${s[1]}</small></button>`).join("")}</div>`:"";
+  const next=lv>=50?"":trackFx(k,lv+1);
+  el.innerHTML=`<div class="hd"><b>${t.nm}</b><span>${lv>0?"LV "+lv+" / 50":"LOCKED"}${sp?" · "+sp.toUpperCase():t.spec&&lv<10?" · specialise at Lv10":""}</span><button class="x" data-x="1">✕</button></div><div class="fx">${lv>0?"Now: "+trackFx(k,lv):trackFx(k,0)}</div>${next?`<div class="fx nx">Lv${lv+1}: ${next}</div>`:""}${specHtml}${lv<50?`<div class="ct">${fmtCost(c)} · takes ${fmtT(upTime(k))}</div>`:""}<div class="gt ${q?"on":w?"":"ok"}" id="bGate">${q?"Upgrading — "+fmtT((q.end-Date.now())/1000)+" left":w||"Ready to upgrade"}</div><div class="bt">${q?`<button class="btn" data-hurry="1">HURRY ${hurryCost(q)} ◆</button>`:lv<50?`<button class="btn" data-up="1" ${w?"disabled":""}>${lv===0?"BUILD":"UPGRADE → LV"+(lv+1)}</button>`:""}</div>`;
+  el.classList.add("show");
+  el.querySelector("[data-x]").onclick=()=>{sfx.click();bSel=null;renderCard();};
+  const up=el.querySelector("[data-up]");if(up)up.onclick=()=>{const r=startUp(k);if(r){tip(r);sfx.deny();}else{sfx.upgrade();tip(t.nm+" upgrade started — "+fmtT(B2.q[B2.q.length-1].dur));}renderCard();renderBaseHud();};
+  const hu=el.querySelector("[data-hurry]");if(hu)hu.onclick=()=>{const r=hurry(k);if(r){tip(r);sfx.deny();}else{applyDone([k]);}renderCard();renderBaseHud();};
+  el.querySelectorAll("[data-spec]").forEach(b=>b.onclick=()=>{const r=setSpec(k,b.dataset.spec);if(r){tip(r);sfx.deny();}else{sfx.level();tip(t.nm+": "+b.dataset.spec);refreshTrack(k);}renderCard();});}
+function renderBaseHud(){$("bOre").textContent=fmt(B2.ore);$("bGas").textContent=fmt(B2.gas);$("bCry").textContent=B2.cry;$("bRel").innerHTML=Object.keys(RELIC).map(r=>`<span style="color:${RELIC[r].col}">${RELIC[r].ic}${B2.relics[r]}</span>`).join("");$("bHall").textContent="Town Hall Lv "+LV("hall")+" · "+B2.runs+" run"+(B2.runs===1?"":"s");
+  $("bq").innerHTML=B2.q.length?B2.q.map(e=>{const left=Math.max(0,(e.end-Date.now())/1000);const pct=Math.max(2,100*(1-left/e.dur));return `<div class="qr" data-k="${e.k}"><span>${TRACKS[e.k].nm} → Lv${LV(e.k)+1}</span><div class="tr"><div class="f" style="width:${pct}%"></div></div><b>${fmtT(left)}</b></div>`;}).join(""):`<div class="qr idle">Crews idle — tap a building, a turret pad or Ren to upgrade</div>`;
+  $("bq").querySelectorAll(".qr[data-k]").forEach(r=>r.onclick=()=>{sfx.click();bSel=r.dataset.k;renderCard();});}
+let lastBaseTick=0;
+function baseTick(){const done=finishQ();if(done.length)applyDone(done);renderBaseHud();
+  if(bSel){const q=B2.q.find(e=>e.k===bSel);const g=$("bGate");if(q&&g){g.textContent="Upgrading — "+fmtT((q.end-Date.now())/1000)+" left";const hb=$("bcard").querySelector("[data-hurry]");if(hb)hb.textContent="HURRY "+hurryCost(q)+" ◆";}else if(done.length)renderCard();}
+  for(const b of [S.hall,...S.buildings]){if(!b.track)continue;const busy=B2.q.some(e=>e.k===b.track);if(busy&&!b.work){b.work=voxel(new THREE.MeshBasicMaterial({color:0xFFD34D}),0,2.3,0,.22,.22,.22,false);b.mesh.add(b.work);}else if(!busy&&b.work){b.mesh.remove(b.work);b.work=null;}}}
+function basePointer(e){if(!downAt)return;const d=Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1]);downAt=null;if(d>12||dragged)return;sfx.unlock();
+  ptr.x=(e.clientX/innerWidth)*2-1;ptr.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(ptr,cam);
+  if(ray.intersectObject(S.hero.mesh,true).length){bSel="ren";renderCard();sfx.click();return;}
+  const all=[S.hall,...S.buildings];const bh=ray.intersectObjects(all.map(b=>b.mesh),true);
+  if(bh.length){let o=bh[0].object,b=null;while(o&&!b){b=all.find(x=>x.mesh===o)||null;o=o.parent;}if(b&&b.track){bSel=b.track;renderCard();sfx.click();return;}}
+  const hits=ray.intersectObjects(cellMesh,false);if(hits.length){const cell=hits[0].object.userData.cell;if(cell.b&&cell.b.track){bSel=cell.b.track;renderCard();sfx.click();return;}}
+  bSel=null;renderCard();}
+function initBase(){$("screen").classList.add("hide");$("hud").style.display="none";$("cards").style.display="none";$("actions").style.display="none";$("bhud").classList.add("on");
+  const hrs=Math.min(8,Math.max(0,(Date.now()-(B2.last||Date.now()))/3.6e6));
+  if(hrs>=.05){let o=0,g=0;for(const b of S.buildings){if(b.perm){o+=(b.oreW||0)*2*hrs;g+=(b.gasW||0)*2*hrs;}}o=Math.round(o);g=Math.round(g);if(o||g){B2.ore+=o;B2.gas+=g;saveB2();setTimeout(()=>tip(`While you were away (${hrs.toFixed(1)}h): +${o} ore, +${g} gas`),700);}}
+  S.hero.tx=S.hero.x;S.hero.tz=S.hero.z;S.camVel=.004;AUDIO.music("intro");renderBaseHud();
+  $("bPlay").addEventListener("click",()=>{sfx.click();goPlay();});$("bRen").addEventListener("click",()=>{sfx.unlock();sfx.click();bSel="ren";renderCard();});
+  $("bSnd").addEventListener("click",()=>{sfx.unlock();const m=AUDIO.cycle();$("bSnd").textContent=m===2?"SOUND":m===1?"SFX ONLY":"MUTED";});
+  window.__base={sel:k=>{bSel=k;renderCard();},up:startUp,hurry:k=>{const r=hurry(k);if(!r)applyDone([k]);renderBaseHud();return r;},spec:setSpec,why,cost:upCost,time:upTime,hud:renderBaseHud,tick:baseTick};}
 for(const i of [0,1]){$("bNext"+i).addEventListener("click",()=>{sfx.unlock();AUDIO.music("intro");sfx.build();document.querySelectorAll("#screen .slide").forEach(sl=>sl.classList.toggle("on",+sl.dataset.i===i+1));S.camAngle+=.9;});}
 $("bStart").addEventListener("click",()=>{sfx.unlock();$("screen").classList.add("hide");S.started=true;S.camVel=.02;startBuild();sfx.build();});
 if(SAVE.ch2&&S.ch===1){$("bCh2").style.display="";$("bCh2").addEventListener("click",()=>{try{localStorage.setItem("holdfast.start","2");}catch(e){}location.reload();});}
@@ -561,7 +657,7 @@ function startCombat(){S.phase="combat";S.t=COMBAT;S.waveDone=false;AUDIO.music(
 function endWave(){income();sfx.waveClear();
   // pods not reached drift on
   for(const p of S.pods){if(!p.got){world.remove(p.mesh);S.lost+=p.n;popText(p.mesh.position,"pod drifted on","bad");}}S.pods=[];
-  S.injured=S.injured.map(x=>x-1).filter(x=>x>0);recalc();neighbourWave();dovCheck();
+  S.injured=S.injured.map(x=>x-MOD.heal).filter(x=>x>0);recalc();neighbourWave();dovCheck();
   S.wave++;if(S.wave>=CW().length){win();return;}startBuild();}
 function dovCheck(){if(S.ch!==2||S.dovDone)return;const mines=S.buildings.filter(b=>b.key==="mine");if(mines.length>=3&&mines.every(m=>m.tier>=2)){S.dovDone=true;S.cry+=10;banner("THE SEAM","It was under the town before the sky went white.","alien");say("Dov — \"It's not from the rocks. It's the ground. The crystal was here first. Whatever did this — it came for what was under us.\" (+10 crystal)");sfx.crystal();}}
 function targetCell(){const occ=cells.filter(c=>c.b&&c.b.key!=="hall");const pool=Math.random()<.6&&occ.length?occ:cells.filter(c=>c.buildable);return pool[Math.floor(Math.random()*pool.length)];}
@@ -597,7 +693,9 @@ function flyLoot(localPos,kind,n){const v=localPos.clone();v.applyMatrix4(world.
   for(let i=0;i<n;i++){const d=document.createElement("div");d.className="dot";d.style.background=kind==="ore"?"#FFD34D":kind==="gas"?"#58D68D":"#B36BFF";d.style.left=(sx+(Math.random()-.5)*30)+"px";d.style.top=(sy+(Math.random()-.5)*30)+"px";document.body.appendChild(d);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{d.style.transform=`translate(${r.left+r.width/2-sx}px,${r.top+r.height/2-sy}px) scale(.5)`;d.style.opacity="0.2";}));setTimeout(()=>{d.remove();pill.classList.remove("bump");void pill.offsetWidth;pill.classList.add("bump");},560+i*40);}}
 function kill(en){S.kills++;const p=en.mesh.position.clone();sfx.kill(en.k);
-  let ore=en.e.ore,gas=en.e.gas;let cry=Math.random()<en.e.cryP?en.e.cryN:0;
+  let ore=en.e.ore,gas=en.e.gas;let cry=(en.e.cryN&&Math.random()<en.e.cryP+MOD.cryP)?Math.ceil(en.e.cryN*MOD.cryMult):0;
+  const relic=en.boss?(en.harvester?"drill":"core"):en.k==="crystal"&&Math.random()<.25?"seam":en.k==="large"&&Math.random()<.06?"seam":((en.k==="fighter"&&Math.random()<.05)||(en.k==="reaper"&&Math.random()<.04))?"lens":null;
+  if(relic){B2.relics[relic]++;saveB2();popText(p.clone().add(new THREE.Vector3(0,1.3,0)),RELIC[relic].ic+" "+RELIC[relic].nm+" recovered","combo");sfx.crystal();}
   S.comboT>0?S.combo++:S.combo=1;S.comboT=1.0;const mult=Math.min(3,S.combo);if(mult>1)ore=Math.round(ore*(1+.25*(mult-1)));
   if(ore){S.ore+=ore;popText(p,"+"+ore+" ore");flyLoot(p,"ore",3);sfx.loot();}if(gas){S.gas+=gas;popText(p.clone().add(new THREE.Vector3(0,.4,0)),"+"+gas+" gas","g");flyLoot(p,"gas",2);}
   if(cry){S.cry+=cry;popText(p.clone().add(new THREE.Vector3(0,.8,0)),"+"+cry+" crystal","c");flyLoot(p,"cry",2);sfx.crystal();}
@@ -608,22 +706,22 @@ function kill(en){S.kills++;const p=en.mesh.position.clone();sfx.kill(en.k);
   if(en.boss&&S.phase==="combat"){for(const x of S.enemies)world.remove(x.mesh);S.enemies=[];S.spawnQ=[];S.t=0;$("bossbar").classList.remove("show");banner(en.harvester?"HARVESTER DOWN":"MOTHERSHIP DOWN",en.harvester?"The seam is ours.":"They pulled back.");cine(2.5,S.camAngle+2.2,.7);}
 }
 function heroCheck(){const need=[10,25,45,70,100,140,190,250,320,1e9];while(S.heroXP>=need[S.heroLv-1]){S.heroLv++;S.hero.spd+=.15;popText(S.hero.mesh.position,"REN LEVEL "+S.heroLv,"combo");sfx.level();}$("sHero").textContent="Lv "+S.heroLv+" · "+Math.round(S.hero.dps*(1+.2*(S.heroLv-1)))+" DPS";}
-function towerXP(b,amt){if(b.it.type!=="tower")return;b.xp+=amt;while(b.lv<5&&b.xp>=TOWER_XP[b.lv-1]){b.lv++;popText(b.mesh.position,b.it.nm+" Lv"+b.lv,"combo");sfx.level();const pip=new THREE.Mesh(new THREE.BoxGeometry(.14,.14,.14),new THREE.MeshBasicMaterial({color:0xFFD34D}));pip.position.set(-.35+(b.lv-2)*.18,1.75,-.3);b.mesh.add(pip);b.pips.push(pip);}}
-function fire(b,en,dt){const it=b.it;if(en.shield){if(b.cd<=0){b.cd=Math.max(.3,it.rate||.3);beam(b.mesh.position.clone().add(new THREE.Vector3(0,1.1,0)),en.mesh.position.clone(),0x8B93B5,.05);}return;}const dmg=b.dps*MOD.dmg*S.out*((S.hero.post===b)?1.5:1)*lvMult(b);en.lastHit=b;
+function towerXP(b,amt){if(b.it.type!=="tower")return;b.xp+=amt*MOD.xp;while(b.lv<5&&b.xp>=TOWER_XP[b.lv-1]){b.lv++;popText(b.mesh.position,b.it.nm+" Lv"+b.lv,"combo");sfx.level();const pip=new THREE.Mesh(new THREE.BoxGeometry(.14,.14,.14),new THREE.MeshBasicMaterial({color:0xFFD34D}));pip.position.set(-.35+(b.lv-2)*.18,1.75,-.3);b.mesh.add(pip);b.pips.push(pip);}}
+function fire(b,en,dt){const it=b.it;if(en.shield){if(b.cd<=0){b.cd=Math.max(.3,it.rate||.3);beam(b.mesh.position.clone().add(new THREE.Vector3(0,1.1,0)),en.mesh.position.clone(),0x8B93B5,.05);}return;}const km=MOD.kind[it.kind]||{dmg:1,splash:1,chain:0};const dmg=b.dps*MOD.dmg*km.dmg*S.out*((S.hero.post===b)?1.5:1)*lvMult(b);en.lastHit=b;
   const from=b.mesh.position.clone();from.y+=1.1;const to=en.mesh.position.clone();
-  if(it.kind==="laser"){en.hp-=dmg*dt;towerXP(b,dmg*dt/10);if(b.cd<=0){b.cd=.06;beam(from,to,0x4FB3FF,.08);sfx.laser();}}
-  else if(it.kind==="beam"){const others=S.enemies.filter(o=>o!==en&&!o.shield&&o.mesh.position.distanceTo(en.mesh.position)<2.2).slice(0,2);en.hp-=dmg*dt;towerXP(b,dmg*dt/10);for(const o of others){o.hp-=dmg*dt*.6;o.lastHit=b;}if(b.cd<=0){b.cd=.07;beam(from,to,0xB36BFF,.09);for(const o of others)beam(to,o.mesh.position.clone(),0xB36BFF,.09);sfx.laser();}}
+  if(it.kind==="laser"){en.hp-=dmg*dt;towerXP(b,dmg*dt/10);let arc=null;if(km.chain){arc=S.enemies.find(o=>o!==en&&!o.shield&&o.mesh.position.distanceTo(en.mesh.position)<2.5);if(arc){arc.hp-=dmg*dt*.6;arc.lastHit=b;}}if(b.cd<=0){b.cd=.06;beam(from,to,0x4FB3FF,.08);if(arc)beam(to,arc.mesh.position.clone(),0x4FB3FF,.08);sfx.laser();}}
+  else if(it.kind==="beam"){const others=S.enemies.filter(o=>o!==en&&!o.shield&&o.mesh.position.distanceTo(en.mesh.position)<2.2).slice(0,km.chain||2);en.hp-=dmg*dt;towerXP(b,dmg*dt/10);for(const o of others){o.hp-=dmg*dt*.6;o.lastHit=b;}if(b.cd<=0){b.cd=.07;beam(from,to,0xB36BFF,.09);for(const o of others)beam(to,o.mesh.position.clone(),0xB36BFF,.09);sfx.laser();}}
   else{if(b.cd>0)return;b.cd=it.rate;const per=dmg*it.rate;
-    if(it.kind==="missile"){beam(from,to,0xE5484D,.25);sfx.missile();for(const o of S.enemies){if(!o.shield&&o.mesh.position.distanceTo(to)<it.splash){o.hp-=per;o.lastHit=b;towerXP(b,per/10);}}}
+    if(it.kind==="missile"){beam(from,to,0xE5484D,.25);sfx.missile();for(const o of S.enemies){if(!o.shield&&o.mesh.position.distanceTo(to)<it.splash*(km.splash||1)){o.hp-=per;o.lastHit=b;towerXP(b,per/10);}}}
     else if(it.kind==="railgun"){beam(from,to,0xFFD34D,.18);beam(from.clone().add(new THREE.Vector3(.05,0,0)),to,0xFFFFFF,.1);en.hp-=per;towerXP(b,per/10);sfx.rail();}
-    else{beam(from,to,0xFFD34D,.06);en.hp-=per;towerXP(b,per/10);sfx.shot();}
+    else{beam(from,to,0xFFD34D,.06);en.hp-=per;towerXP(b,per/10);sfx.shot();if(km.siege){for(const o of S.enemies){if(o!==en&&!o.shield&&o.mesh.position.distanceTo(to)<1.0){o.hp-=per*.5;o.lastHit=b;}}}}
     if(b.mesh.userData.turret){b.mesh.userData.turret.lookAt(to);}
   }}
 function beam(a,b,col,life){const g=new THREE.BufferGeometry().setFromPoints([a,b]);const l=new THREE.Line(g,new THREE.LineBasicMaterial({color:col}));world.add(l);S.shots.push({l,t:life});}
 function win(){S.over=true;AUDIO.music("win");sfx.win();bankRun(true);saveGame(S.ch===1?{ch2:true,heroLv:S.heroLv,cry:S.cry,ch1Stars:Math.min(3,(S.lost===0?1:0)+(S.hall.hp>=S.hall.maxhp*.5?1:0)+1)}:{ch3:true,heroLv:S.heroLv,cry:S.cry});
   setTimeout(()=>screen(S.ch===1?"CHAPTER 1 — HOLDFAST":"CHAPTER 2 — NEIGHBOURS",S.ch===1?`They pulled back. ${S.pop} of you now, on a rock that used to be a town. HOLD has been hearing voices on the old radio — other islands, other survivors.`:`The machine is scrap on the seam. Marrow Hill is cheering across the bridge. And Dov was right: the crystal was under us all along. Whatever ended the world came for it — and it's still out there, still pulling pieces of home up into the dark.`,"island"),2600);}
 function lose(){S.over=true;AUDIO.music("lose");sfx.lose();bankRun(false);screen("THE HALL IS GONE",`Wave ${S.wave+1}. ${S.pop} people and nowhere to stand. Mine first, house the pods before they land, and keep Ren near whatever's taking hits.`,"");}
-function screen(h,t,art){const sc=$("screen");sc.classList.remove("hide");const stars=Math.min(3,(S.lost===0?1:0)+(S.hall.hp>=S.hall.maxhp*.5?1:0)+1);sc.innerHTML=`<div class="box"><div class="art ${art||""}"></div><h1>${h}</h1><p>${t}</p><div class="k"><span>Rocks and ships</span><b>${S.kills}</b><span>Survivors rescued</span><b>${S.rescued}</b><span>Lost or drifted</span><b>${S.lost}</b><span>Ren</span><b>Lv ${S.heroLv}</b><span>Ore banked</span><b>${fmt(S.ore)}</b><span>Crystal</span><b>${S.cry}</b><span>Buildings standing</span><b>${S.buildings.length}</b><span>Hall</span><b>${Math.max(0,Math.round(S.hall.hp/S.hall.maxhp*100))}%</b><span>Crystal banked</span><b>+${S.banked||0} → ${BASE.bank}</b></div>${S.over&&h.startsWith("CHAPTER")?`<p class="tap">${"★".repeat(stars)}${"☆".repeat(3-stars)} — no one lost, hall above half, mothership down</p>`:""}${S.over&&h.startsWith("CHAPTER 1")?`<button class="btn" onclick="try{localStorage.setItem('holdfast.start','2')}catch(e){};location.reload()">CONTINUE — CHAPTER 2</button>`:""}${S.over&&h.startsWith("CHAPTER 2")?`<p class="tap">CHAPTER 3: THE ENGINE — COMING NEXT</p>`:""}<button class="btn alt" onclick="window.__openBase()">HOME BASE</button><button class="btn snd" onclick="try{localStorage.removeItem('holdfast.start')}catch(e){};location.reload()">${S.over&&h.startsWith("CHAPTER")?"BACK TO START":"PLAY AGAIN"}</button></div>`;}
+function screen(h,t,art){const sc=$("screen");sc.classList.remove("hide");const stars=Math.min(3,(S.lost===0?1:0)+(S.hall.hp>=S.hall.maxhp*.5?1:0)+1);sc.innerHTML=`<div class="box"><div class="art ${art||""}"></div><h1>${h}</h1><p>${t}</p><div class="k"><span>Rocks and ships</span><b>${S.kills}</b><span>Survivors rescued</span><b>${S.rescued}</b><span>Lost or drifted</span><b>${S.lost}</b><span>Ren</span><b>Lv ${S.heroLv}</b><span>Ore banked</span><b>${fmt(S.ore)}</b><span>Crystal</span><b>${S.cry}</b><span>Buildings standing</span><b>${S.buildings.length}</b><span>Hall</span><b>${Math.max(0,Math.round(S.hall.hp/S.hall.maxhp*100))}%</b><span>Banked</span><b>+${(S.banked||{}).o||0} ore · +${(S.banked||{}).g||0} gas · +${(S.banked||{}).c||0} ◆</b></div>${S.over&&h.startsWith("CHAPTER")?`<p class="tap">${"★".repeat(stars)}${"☆".repeat(3-stars)} — no one lost, hall above half, mothership down</p>`:""}${S.over&&h.startsWith("CHAPTER 1")?`<button class="btn" onclick="try{localStorage.setItem('holdfast.start','2')}catch(e){};location.reload()">CONTINUE — CHAPTER 2</button>`:""}${S.over&&h.startsWith("CHAPTER 2")?`<p class="tap">CHAPTER 3: THE ENGINE — COMING NEXT</p>`:""}<button class="btn alt" onclick="window.__openBase()">HOME BASE</button><button class="btn snd" onclick="try{localStorage.removeItem('holdfast.start')}catch(e){};location.reload()">${S.over&&h.startsWith("CHAPTER")?"BACK TO START":"PLAY AGAIN"}</button></div>`;}
 // ---------- loop ----------
 let last=performance.now();
 function placeCam(){const w=innerWidth,h=innerHeight;const dist=w<h?28:19;const p=S.camPitch||0.95;cam.position.set(0,dist*Math.sin(p),dist*Math.cos(p));cam.lookAt(0,0.3,0.4);}
@@ -697,6 +795,7 @@ function step(now){const raw=Math.min(.05,(now-last)/1000);last=now;requestAnima
     }
     heroCheck();
   }
+  if(S.baseMode){const tk=(now/500)|0;if(tk!==lastBaseTick){lastBaseTick=tk;baseTick();}for(const b of [S.hall,...S.buildings]){if(b.work){b.work.rotation.y+=dt*3;b.work.position.y=2.3+Math.sin(now*.004)*.12;}}}
   // reticle follows the lowest falling asteroid
   {let low=null;for(const en of S.enemies){if(en.fly||en.boss)continue;if(!low||en.mesh.position.y<low.mesh.position.y)low=en;}
     reticle.visible=retInner.visible=!!low&&S.phase==="combat";if(low){reticle.position.x=retInner.position.x=low.tx;reticle.position.z=retInner.position.z=low.tz;reticle.position.y=low.cell.h+.53;retInner.position.y=low.cell.h+.54;const sc=1+Math.sin(now*.012)*.12;reticle.scale.set(sc,sc,1);retInner.rotation.z+=dt*3;}}
@@ -712,7 +811,7 @@ function step(now){const raw=Math.min(.05,(now-last)/1000);last=now;requestAnima
   if(!downAt&&Math.abs(S.camVel)>0.0005){S.camAngle+=S.camVel;S.camVel*=0.92;}
   world.rotation.y=S.camAngle;world.updateMatrixWorld();
   R.render(scene,cam);}
-recalc();requestAnimationFrame(step);
+placePermanent(S.baseMode);if(S.baseMode)initBase();recalc();requestAnimationFrame(step);
 })();
 </script>
 
