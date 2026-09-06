@@ -127,8 +127,11 @@ platform :ios do
     deliver(
       api_key: api_key, app_identifier: APP_ID, app_version: "1.0",
       skip_binary_upload: true,
-      metadata_path: "fastlane/metadata", screenshots_path: "fastlane/screenshots",
-      overwrite_screenshots: true, app_rating_config_path: "fastlane/rating.json",
+      metadata_path: "fastlane/metadata",
+      # Screenshots were published once (38 across en-AU/en-US). Re-uploading with overwrite_screenshots
+      # intermittently fails ("Failed verification of all screenshots deleted"), so listing pushes text only.
+      # To refresh screenshots: run this lane locally with skip_screenshots: false, overwrite_screenshots: true.
+      skip_screenshots: true, app_rating_config_path: "fastlane/rating.json",
       precheck_include_in_app_purchases: false, run_precheck_before_submit: false,
       force: true, submit_for_review: false
     )
